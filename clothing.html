@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>HelpMatrix - Clothing</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<canvas id="particles-canvas"></canvas>
+
+<!-- NAVBAR -->
+<nav class="navbar" data-ocid="nav.panel">
+  <a href="landing.html" class="nav-logo" data-ocid="nav.home.link">
+    <img src="/assets/generated/helpmatrix-logo-transparent.dim_400x150.png" alt="HelpMatrix Logo"/>
+    <span class="nav-logo-text">HelpMatrix</span>
+  </a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="landing.html" data-ocid="nav.home.link">Home</a></li>
+    <li><a href="landing.html#categories" data-ocid="nav.categories.link">Categories</a></li>
+    <li><a href="landing.html#about" data-ocid="nav.about.link">About</a></li>
+    <li><a href="index.html" class="nav-cta" data-ocid="nav.login.button">Login</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" data-ocid="nav.toggle"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- HERO -->
+<div class="category-hero" data-ocid="category.hero.panel">
+  <div class="category-hero-bg">
+    <img src="/assets/generated/category-clothing.dim_600x400.jpg" alt="Clothing"/>
+  </div>
+  <div class="category-hero-content">
+    <span class="category-hero-icon">👕</span>
+    <h1 class="category-hero-title">Clothing</h1>
+    <p class="category-hero-desc">Borrow, donate, or request clothing for any need. From warm winter jackets to daily essentials — help is here.</p>
+    <a href="index.html" class="btn-primary" data-ocid="category.request.button">Request Now</a>
+  </div>
+</div>
+
+<!-- PRODUCTS -->
+<div class="products-section" data-ocid="products.section">
+  <div class="products-toolbar">
+    <div class="products-count">Showing <strong>10</strong> items available</div>
+    <div class="products-filters">
+      <button class="filter-btn active" data-ocid="products.all.tab">All</button>
+      <button class="filter-btn" data-ocid="products.men.tab">Men</button>
+      <button class="filter-btn" data-ocid="products.women.tab">Women</button>
+      <button class="filter-btn" data-ocid="products.kids.tab">Kids</button>
+      <button class="filter-btn" data-ocid="products.winter.tab">Winter</button>
+    </div>
+  </div>
+  <div class="products-grid" data-ocid="products.list">
+
+    <div class="product-card" data-ocid="products.item.1">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap">
+        <img src="/assets/generated/product-jacket.dim_400x300.jpg" alt="Winter Jacket"/>
+      </div>
+      <div class="product-body">
+        <div class="product-name">Heavy Winter Jacket (Men's)</div>
+        <div class="product-meta">Size: M–XL &nbsp;·&nbsp; Condition: Good &nbsp;·&nbsp; Delhi, Sector 9</div>
+        <div class="product-tags"><span class="product-tag">Winter</span><span class="product-tag">Men</span><span class="product-tag">Jacket</span></div>
+        <div class="product-footer">
+          <div class="product-price free">FREE</div>
+          <button class="product-action-btn" data-ocid="products.item.1.button">Request</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.2">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap">
+        <img src="/assets/generated/category-clothing.dim_600x400.jpg" alt="Saree Set"/>
+      </div>
+      <div class="product-body">
+        <div class="product-name">Cotton Saree Set (Women's)</div>
+        <div class="product-meta">2 sarees &nbsp;·&nbsp; Condition: Excellent &nbsp;·&nbsp; Mumbai, Andheri</div>
+        <div class="product-tags"><span class="product-tag">Women</span><span class="product-tag">Saree</span><span class="product-tag">Cotton</span></div>
+        <div class="product-footer">
+          <div class="product-price free">FREE</div>
+          <button class="product-action-btn" data-ocid="products.item.2.button">Request</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.3">
+      <span class="product-badge urgent">Urgent</span>
+      <div class="product-img-wrap">
+        <img src="/assets/generated/product-jacket.dim_400x300.jpg" alt="School Uniform"/>
+      </div>
+      <div class="product-body">
+        <div class="product-name">School Uniform Set (Kids)</div>
+        <div class="product-meta">Age 8–12 &nbsp;·&nbsp; Condition: Good &nbsp;·&nbsp; Pune, Camp</div>
+        <div class="product-tags"><span class="product-tag">Kids</span><span class="product-tag">School</span><span class="product-tag">Uniform</span></div>
+        <div class="product-footer">
+          <div class="product-price free">FREE</div>
+          <button class="product-action-btn" data-ocid="products.item.3.button">Request</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.4">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap">
+        <img src="/assets/generated/category-clothing.dim_600x400.jpg" alt="Kurta Set"/>
+      </div>
+      <div class="product-body">
+        <div class="product-name">Festive Kurta Set (Men's)</div>
+        <div class="product-meta">Size: L &nbsp;·&nbsp; Occasion: Festival/Wedding &nbsp;·&nbsp; Hyderabad</div>
+        <div class="product-tags"><span class="product-tag">Men</span><span class="product-tag">Festive</span></div>
+        <div class="product-footer">
+          <div class="product-price free">FREE</div>
+          <button class="product-action-btn" data-ocid="products.item.4.button">Request</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.5">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap">
+        <img src="/assets/generated/product-jacket.dim_400x300.jpg" alt="Raincoat"/>
+      </div>
+      <div class="product-body">
+        <div class="product-name">Waterproof Raincoat</div>
+        <div class="product-meta">Unisex, One Size &nbsp;·&nbsp; Condition: New &nbsp;·&nbsp; Bangalore</div>
+        <div class="product-tags"><span class="product-tag">Unisex</span><span class="product-tag">Monsoon</span></div>
+        <div class="product-footer">
+          <div class="product-price free">FREE</div>
+          <button class="product-action-btn" data-ocid="products.item.5.button">Request</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.6">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap">
+        <img src="/assets/generated/category-clothing.dim_600x400.jpg" alt="Baby Clothes"/>
+      </div>
+      <div class="product-body">
+        <div class="product-name">Baby Clothes Bundle (0–2 yr)</div>
+        <div class="product-meta">15 pieces &nbsp;·&nbsp; Washed &amp; Clean &nbsp;·&nbsp; Chennai</div>
+        <div class="product-tags"><span class="product-tag">Baby</span><span class="product-tag">Bundle</span></div>
+        <div class="product-footer">
+          <div class="product-price free">FREE</div>
+          <button class="product-action-btn" data-ocid="products.item.6.button">Request</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.7">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap">
+        <img src="/assets/generated/product-jacket.dim_400x300.jpg" alt="Warm Blanket"/>
+      </div>
+      <div class="product-body">
+        <div class="product-name">Woolen Blanket / Shawl</div>
+        <div class="product-meta">Adult Size &nbsp;·&nbsp; Clean &amp; Folded &nbsp;·&nbsp; Jaipur</div>
+        <div class="product-tags"><span class="product-tag">Winter</span><span class="product-tag">Blanket</span></div>
+        <div class="product-footer">
+          <div class="product-price free">FREE</div>
+          <button class="product-action-btn" data-ocid="products.item.7.button">Request</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.8">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap">
+        <img src="/assets/generated/category-clothing.dim_600x400.jpg" alt="T-Shirts"/>
+      </div>
+      <div class="product-body">
+        <div class="product-name">T-Shirt Pack (Men's, 5pc)</div>
+        <div class="product-meta">Size: M–XL &nbsp;·&nbsp; Cotton &nbsp;·&nbsp; Kolkata</div>
+        <div class="product-tags"><span class="product-tag">Men</span><span class="product-tag">Cotton</span><span class="product-tag">Casual</span></div>
+        <div class="product-footer">
+          <div class="product-price free">FREE</div>
+          <button class="product-action-btn" data-ocid="products.item.8.button">Request</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.9">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap">
+        <img src="/assets/generated/product-jacket.dim_400x300.jpg" alt="Ladies Suit"/>
+      </div>
+      <div class="product-body">
+        <div class="product-name">Ladies Salwar Suit Set</div>
+        <div class="product-meta">Size: 38–42 &nbsp;·&nbsp; Cotton &nbsp;·&nbsp; Lucknow</div>
+        <div class="product-tags"><span class="product-tag">Women</span><span class="product-tag">Salwar</span></div>
+        <div class="product-footer">
+          <div class="product-price free">FREE</div>
+          <button class="product-action-btn" data-ocid="products.item.9.button">Request</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.10">
+      <span class="product-badge urgent">Limited</span>
+      <div class="product-img-wrap">
+        <img src="/assets/generated/category-clothing.dim_600x400.jpg" alt="Shoes"/>
+      </div>
+      <div class="product-body">
+        <div class="product-name">Sports Shoes (Men's, Size 8–10)</div>
+        <div class="product-meta">Condition: Good &nbsp;·&nbsp; Ahmedabad</div>
+        <div class="product-tags"><span class="product-tag">Footwear</span><span class="product-tag">Men</span></div>
+        <div class="product-footer">
+          <div class="product-price free">FREE</div>
+          <button class="product-action-btn" data-ocid="products.item.10.button">Request</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer style="background:rgba(5,10,20,0.98);border-top:1px solid var(--glass-border);padding:2rem;text-align:center;position:relative;z-index:5;">
+  <p style="color:var(--text-muted);font-size:0.85rem;">© 2025 HelpMatrix. <a href="landing.html" style="color:var(--accent-blue);">Back to Home</a> &nbsp;|&nbsp; Emergency: 112</p>
+</footer>
+
+<button class="back-to-top" id="backToTop" aria-label="Back to top" data-ocid="page.back_to_top.button">↑</button>
+<div id="toast" class="toast" data-ocid="page.toast"></div>
+<script src="main.js"></script>
+<script>
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

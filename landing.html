@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>HelpMatrix - Home</title>
+  <meta name="description" content="HelpMatrix - Your trusted emergency help platform for clothing, blood bank, electronics, household workers and more."/>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+<canvas id="particles-canvas"></canvas>
+
+<!-- NAVBAR -->
+<nav class="navbar" data-ocid="nav.panel">
+  <a href="landing.html" class="nav-logo" data-ocid="nav.home.link">
+    <img src="/assets/generated/helpmatrix-logo-transparent.dim_400x150.png" alt="HelpMatrix Logo"/>
+    <span class="nav-logo-text">HelpMatrix</span>
+  </a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="landing.html" data-ocid="nav.home.link">Home</a></li>
+    <li><a href="#categories" data-ocid="nav.categories.link">Categories</a></li>
+    <li><a href="#how-it-works" data-ocid="nav.how.link">How It Works</a></li>
+    <li><a href="#about" data-ocid="nav.about.link">About</a></li>
+    <li><a href="#contact" data-ocid="nav.contact.link">Contact</a></li>
+    <li><a href="index.html" class="nav-cta" data-ocid="nav.login.button">Login / Sign Up</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Menu" data-ocid="nav.toggle">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- EMERGENCY TICKER -->
+<div class="emergency-ticker">
+  <span class="ticker-label">🚨 LIVE</span>
+  <div class="ticker-track">
+    <div class="ticker-content">
+      <span>Blood needed: O+ at AIIMS Delhi — Call 112 &nbsp;|&nbsp;</span>
+      <span>Free clothing drive: Rajiv Nagar Community Hall &nbsp;|&nbsp;</span>
+      <span>Emergency plumber available 24/7: 98XXXXXXXX &nbsp;|&nbsp;</span>
+      <span>Electronics borrow: Laptop available in Sector 5 &nbsp;|&nbsp;</span>
+      <span>Blood needed: O+ at AIIMS Delhi — Call 112 &nbsp;|&nbsp;</span>
+      <span>Free clothing drive: Rajiv Nagar Community Hall &nbsp;|&nbsp;</span>
+      <span>Emergency plumber available 24/7: 98XXXXXXXX &nbsp;|&nbsp;</span>
+      <span>Electronics borrow: Laptop available in Sector 5 &nbsp;|&nbsp;</span>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero" style="margin-top:0;min-height:calc(100vh - 110px);">
+  <div id="three-canvas"></div>
+  <div class="hero-video-bg">
+    <img src="/assets/generated/hero-banner.dim_1600x800.jpg" alt="HelpMatrix Hero" class="hero-img-fallback"/>
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-badge">🛡️ India's Emergency Help Network</div>
+    <h1 class="hero-title">
+      Every Crisis Has a<br/><span>Solution Here</span>
+    </h1>
+    <p class="hero-sub">
+      HelpMatrix connects people in need with trusted providers for clothing, blood, electronics,
+      household workers, emergency helplines and more — instantly, reliably, 24/7.
+    </p>
+    <div class="hero-buttons">
+      <a href="index.html" class="btn-primary" data-ocid="hero.register.button">Get Help Now</a>
+      <a href="#categories" class="btn-secondary" data-ocid="hero.explore.button">Explore Services</a>
+      <a href="index.html?provider=true" class="btn-danger" data-ocid="hero.provider.button">Become a Provider</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar" id="stats" data-ocid="stats.panel">
+  <div class="stat-item">
+    <div class="stat-number"><span class="counter" data-target="50000" data-suffix="+">0</span></div>
+    <div class="stat-label">Registered Users</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number"><span class="counter" data-target="12000" data-suffix="+">0</span></div>
+    <div class="stat-label">Providers</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number"><span class="counter" data-target="98" data-suffix="%">0</span></div>
+    <div class="stat-label">Satisfaction Rate</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number"><span class="counter" data-target="24" data-suffix="/7">0</span></div>
+    <div class="stat-label">Emergency Support</div>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<section id="categories" class="categories-section" data-ocid="categories.section">
+  <div class="section-header reveal">
+    <div class="section-tag">Services</div>
+    <h2 class="section-title">Browse <span>Emergency</span> Categories</h2>
+    <p class="section-desc">Every category is staffed by verified providers ready to help when you need it most.</p>
+  </div>
+
+  <div class="categories-grid" data-ocid="categories.list">
+    <!-- Clothing -->
+    <a href="clothing.html" class="category-card reveal" data-ocid="categories.clothing.card">
+      <img src="/assets/generated/category-clothing.dim_600x400.jpg" alt="Clothing" class="category-card-img"/>
+      <div class="category-card-body">
+        <span class="category-card-icon">👕</span>
+        <div class="category-card-title">Clothing</div>
+        <div class="category-card-desc">Borrow or donate clothes for any need — emergency, seasonal, or daily wear. Dignified help, fast delivery.</div>
+        <span class="category-card-badge">Browse Clothing</span>
+      </div>
+    </a>
+
+    <!-- Blood Bank -->
+    <a href="blood-bank.html" class="category-card red reveal" data-ocid="categories.blood.card">
+      <img src="/assets/generated/category-blood.dim_600x400.jpg" alt="Blood Bank" class="category-card-img"/>
+      <div class="category-card-body">
+        <span class="category-card-icon">🩸</span>
+        <div class="category-card-title">Blood Bank</div>
+        <div class="category-card-desc">Find blood donors and blood banks near you. Emergency blood requests handled in minutes.</div>
+        <span class="category-card-badge" style="color:#ef4444;">Find Blood</span>
+      </div>
+    </a>
+
+    <!-- Aadhaar -->
+    <a href="aadhaar.html" class="category-card purple reveal" data-ocid="categories.aadhaar.card">
+      <img src="/assets/generated/category-aadhaar.dim_600x400.jpg" alt="Aadhaar" class="category-card-img"/>
+      <div class="category-card-body">
+        <span class="category-card-icon">🪪</span>
+        <div class="category-card-title">Aadhaar Services</div>
+        <div class="category-card-desc">Aadhaar enrollment, update, and document support services available at your doorstep.</div>
+        <span class="category-card-badge" style="color:#8b5cf6;">Get Help</span>
+      </div>
+    </a>
+
+    <!-- Electronics -->
+    <a href="electronics.html" class="category-card reveal" data-ocid="categories.electronics.card">
+      <img src="/assets/generated/category-electronics.dim_600x400.jpg" alt="Electronics" class="category-card-img"/>
+      <div class="category-card-body">
+        <span class="category-card-icon">💻</span>
+        <div class="category-card-title">Electronics</div>
+        <div class="category-card-desc">Borrow laptops, phones, chargers, fans, and more from verified community providers.</div>
+        <span class="category-card-badge">Browse Electronics</span>
+      </div>
+    </a>
+
+    <!-- Emergency Helpline -->
+    <a href="emergency.html" class="category-card red reveal" data-ocid="categories.emergency.card">
+      <img src="/assets/generated/category-emergency.dim_600x400.jpg" alt="Emergency" class="category-card-img"/>
+      <div class="category-card-body">
+        <span class="category-card-icon">🚨</span>
+        <div class="category-card-title">Emergency Helpline</div>
+        <div class="category-card-desc">Instant access to emergency services: ambulance, fire, police, women's helpline, and more.</div>
+        <span class="category-card-badge" style="color:#ef4444;">Call Now</span>
+      </div>
+    </a>
+
+    <!-- Household Workers -->
+    <a href="household.html" class="category-card green reveal" data-ocid="categories.household.card">
+      <img src="/assets/generated/category-household.dim_600x400.jpg" alt="Household Workers" class="category-card-img"/>
+      <div class="category-card-body">
+        <span class="category-card-icon">🏠</span>
+        <div class="category-card-title">Household Workers</div>
+        <div class="category-card-desc">Book verified cleaners, cooks, electricians, plumbers, and more for your home needs.</div>
+        <span class="category-card-badge" style="color:#22c55e;">Book Now</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works" class="how-section" data-ocid="how.section">
+  <div class="section-header reveal">
+    <div class="section-tag">Process</div>
+    <h2 class="section-title">How <span>HelpMatrix</span> Works</h2>
+    <p class="section-desc">Getting help or providing it has never been simpler.</p>
+  </div>
+  <div class="steps-grid" style="max-width:1100px;margin:0 auto;">
+    <div class="step-card reveal">
+      <div class="step-icon">📝</div>
+      <div class="step-number">1</div>
+      <div class="step-title">Register</div>
+      <div class="step-desc">Sign up as a Consumer or Provider with basic details in under 2 minutes.</div>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-icon">🔍</div>
+      <div class="step-number">2</div>
+      <div class="step-title">Find What You Need</div>
+      <div class="step-desc">Browse categories — clothing, blood, electronics, workers — and find the right match.</div>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-icon">📞</div>
+      <div class="step-number">3</div>
+      <div class="step-title">Connect</div>
+      <div class="step-desc">Request directly from providers. Get their contact and connect instantly.</div>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-icon">✅</div>
+      <div class="step-number">4</div>
+      <div class="step-title">Get Help</div>
+      <div class="step-desc">Receive help fast. Rate your experience and help improve the community.</div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section" data-ocid="testimonials.section">
+  <div class="section-header reveal">
+    <div class="section-tag">Reviews</div>
+    <h2 class="section-title">What <span>People Say</span></h2>
+    <p class="section-desc">Thousands of people trust HelpMatrix every day.</p>
+  </div>
+  <div class="testimonials-grid" data-ocid="testimonials.list">
+    <div class="testimonial-card reveal" data-ocid="testimonials.item.1">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">"When my father needed blood urgently at 2AM, HelpMatrix connected us with a donor within 20 minutes. Absolutely life-saving."</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar">R</div>
+        <div>
+          <div class="testimonial-name">Rahul Sharma</div>
+          <div class="testimonial-role">Delhi, Consumer</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal" data-ocid="testimonials.item.2">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">"As a clothing provider, I've connected with over 200 families in need. The platform makes it incredibly easy to manage requests."</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar">P</div>
+        <div>
+          <div class="testimonial-name">Priya Mehta</div>
+          <div class="testimonial-role">Mumbai, Provider</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal" data-ocid="testimonials.item.3">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">"I borrowed a laptop during exam prep when mine broke. Returned it clean. HelpMatrix builds real community trust."</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar">A</div>
+        <div>
+          <div class="testimonial-name">Anjali Singh</div>
+          <div class="testimonial-role">Pune, Student</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="about-section" data-ocid="about.section">
+  <div class="section-header reveal">
+    <div class="section-tag">About Us</div>
+    <h2 class="section-title">Built for <span>India's</span> Real Emergencies</h2>
+    <p class="section-desc">HelpMatrix was born from a simple belief: in times of crisis, communities should be able to help each other instantly.</p>
+  </div>
+  <div style="max-width:800px;margin:0 auto;text-align:center;" class="reveal">
+    <p style="color:var(--text-muted);line-height:1.9;font-size:1.05rem;margin-bottom:1.5rem;">
+      We are a team of technologists and social workers who saw the gap between people in need and people willing to help.
+      HelpMatrix bridges that gap across every Indian city — connecting consumers with verified local providers for clothing,
+      blood, electronics, aadhaar services, household help, and emergency response.
+    </p>
+    <p style="color:var(--text-muted);line-height:1.9;font-size:1.05rem;">
+      Our platform is free for consumers and community-driven. Providers undergo verification to ensure trust and safety.
+      Every interaction on HelpMatrix is designed with dignity, speed, and reliability in mind.
+    </p>
+    <div style="margin-top:2.5rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      <a href="index.html" class="btn-primary" data-ocid="about.register.button">Join the Network</a>
+      <a href="#contact" class="btn-secondary" data-ocid="about.contact.button">Contact Us</a>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="contact-section" data-ocid="contact.section">
+  <div class="section-header reveal">
+    <div class="section-tag">Contact</div>
+    <h2 class="section-title">Get in <span>Touch</span></h2>
+    <p class="section-desc">Reach out for support, partnerships, or emergencies.</p>
+  </div>
+  <div class="contact-grid">
+    <div class="contact-info reveal">
+      <div class="contact-item">
+        <div class="contact-item-icon">📞</div>
+        <div>
+          <div class="contact-item-title">Emergency Helpline</div>
+          <div class="contact-item-text">+91 1800-HELP-NOW (Free, 24/7)</div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-item-icon">✉️</div>
+        <div>
+          <div class="contact-item-title">Email Support</div>
+          <div class="contact-item-text">help@helpmatrix.in</div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-item-icon">📍</div>
+        <div>
+          <div class="contact-item-title">Headquarters</div>
+          <div class="contact-item-text">New Delhi, India — Serving all major cities</div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-item-icon">⏰</div>
+        <div>
+          <div class="contact-item-title">Support Hours</div>
+          <div class="contact-item-text">Emergency: 24/7 &nbsp;|&nbsp; General: Mon-Sat 9AM-8PM</div>
+        </div>
+      </div>
+    </div>
+    <div class="contact-form-card reveal">
+      <h3 style="font-weight:700;margin-bottom:1.5rem;">Send a Message</h3>
+      <form id="contact-form">
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <input class="form-input" type="text" placeholder="Full name" required data-ocid="contact.name.input"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email or Mobile</label>
+          <input class="form-input" type="text" placeholder="Email or mobile number" required data-ocid="contact.email.input"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Message</label>
+          <textarea class="form-input" rows="4" placeholder="Your message..." required data-ocid="contact.message.textarea" style="resize:vertical;"></textarea>
+        </div>
+        <button type="submit" class="submit-btn" data-ocid="contact.submit.button">Send Message</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer data-ocid="footer.panel">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+        <img src="/assets/generated/helpmatrix-logo-transparent.dim_400x150.png" alt="HelpMatrix" style="height:36px;"/>
+        <span style="font-family:'Orbitron',monospace;font-weight:900;background:linear-gradient(135deg,#3b82f6,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">HelpMatrix</span>
+      </div>
+      <p>India's #1 emergency help platform. Connecting people in need with trusted providers — fast, free, and dignified.</p>
+      <div class="footer-socials">
+        <a class="footer-social-btn" href="#" data-ocid="footer.twitter.link">𝕏</a>
+        <a class="footer-social-btn" href="#" data-ocid="footer.facebook.link">f</a>
+        <a class="footer-social-btn" href="#" data-ocid="footer.instagram.link">📷</a>
+        <a class="footer-social-btn" href="#" data-ocid="footer.whatsapp.link">💬</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a href="clothing.html" data-ocid="footer.clothing.link">Clothing</a></li>
+        <li><a href="blood-bank.html" data-ocid="footer.blood.link">Blood Bank</a></li>
+        <li><a href="aadhaar.html" data-ocid="footer.aadhaar.link">Aadhaar Services</a></li>
+        <li><a href="electronics.html" data-ocid="footer.electronics.link">Electronics</a></li>
+        <li><a href="emergency.html" data-ocid="footer.emergency.link">Emergency Helpline</a></li>
+        <li><a href="household.html" data-ocid="footer.household.link">Household Workers</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Platform</h4>
+      <ul>
+        <li><a href="index.html" data-ocid="footer.login.link">Login / Register</a></li>
+        <li><a href="#how-it-works" data-ocid="footer.how.link">How It Works</a></li>
+        <li><a href="#about" data-ocid="footer.about.link">About Us</a></li>
+        <li><a href="#" data-ocid="footer.providers.link">Provider Portal</a></li>
+        <li><a href="#" data-ocid="footer.blog.link">Blog</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#" data-ocid="footer.terms.link">Terms of Service</a></li>
+        <li><a href="#" data-ocid="footer.privacy.link">Privacy Policy</a></li>
+        <li><a href="#" data-ocid="footer.refund.link">Refund Policy</a></li>
+        <li><a href="#contact" data-ocid="footer.support.link">Support</a></li>
+        <li><a href="#" data-ocid="footer.faq.link">FAQ</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 HelpMatrix. Made with ❤️ in India. All rights reserved.</p>
+    <div class="footer-emergency">🚨 National Emergency: 112</div>
+  </div>
+</footer>
+
+<button class="back-to-top" id="backToTop" aria-label="Back to top" data-ocid="page.back_to_top.button">↑</button>
+<div id="toast" class="toast" data-ocid="page.toast"></div>
+
+<script src="main.js"></script>
+<script>
+  // Contact form
+  document.getElementById('contact-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    showToast('Message sent! We will get back to you soon.');
+    this.reset();
+  });
+</script>
+</body>
+</html>
+ 

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>HelpMatrix - Aadhaar Services</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<canvas id="particles-canvas"></canvas>
+
+<nav class="navbar" data-ocid="nav.panel">
+  <a href="landing.html" class="nav-logo" data-ocid="nav.home.link">
+    <img src="/assets/generated/helpmatrix-logo-transparent.dim_400x150.png" alt="HelpMatrix Logo"/>
+    <span class="nav-logo-text">HelpMatrix</span>
+  </a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="landing.html" data-ocid="nav.home.link">Home</a></li>
+    <li><a href="landing.html#categories" data-ocid="nav.categories.link">Categories</a></li>
+    <li><a href="index.html" class="nav-cta" data-ocid="nav.login.button">Login</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" data-ocid="nav.toggle"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="category-hero" data-ocid="category.hero.panel">
+  <div class="category-hero-bg">
+    <img src="/assets/generated/category-aadhaar.dim_600x400.jpg" alt="Aadhaar Services"/>
+  </div>
+  <div class="category-hero-content">
+    <span class="category-hero-icon">🪪</span>
+    <h1 class="category-hero-title" style="background:linear-gradient(135deg,#8b5cf6,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Aadhaar Services</h1>
+    <p class="category-hero-desc">Doorstep Aadhaar enrollment, updates, corrections, and document assistance from verified operators.</p>
+    <a href="index.html" class="btn-primary" data-ocid="category.request.button">Book Operator</a>
+  </div>
+</div>
+
+<div class="products-section" data-ocid="products.section">
+  <div class="products-toolbar">
+    <div class="products-count">Showing <strong>10</strong> Aadhaar services</div>
+    <div class="products-filters">
+      <button class="filter-btn active" data-ocid="products.all.tab">All</button>
+      <button class="filter-btn" data-ocid="products.new.tab">New Enrollment</button>
+      <button class="filter-btn" data-ocid="products.update.tab">Update</button>
+      <button class="filter-btn" data-ocid="products.correction.tab">Correction</button>
+    </div>
+  </div>
+  <div class="products-grid" data-ocid="products.list">
+
+    <div class="product-card" data-ocid="products.item.1">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap"><img src="/assets/generated/category-aadhaar.dim_600x400.jpg" alt="New Enrollment"/></div>
+      <div class="product-body">
+        <div class="product-name">New Aadhaar Enrollment — Adult</div>
+        <div class="product-meta">Biometric + document verification &nbsp;·&nbsp; Delhi, NCR</div>
+        <div class="product-tags"><span class="product-tag">New</span><span class="product-tag">Adult</span></div>
+        <div class="product-footer"><div class="product-price free">FREE Govt.</div>
+        <button class="product-action-btn" data-ocid="products.item.1.button">Book</button></div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.2">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap"><img src="/assets/generated/category-aadhaar.dim_600x400.jpg" alt="Child Enrollment"/></div>
+      <div class="product-body">
+        <div class="product-name">Child Aadhaar (Baal Aadhaar)</div>
+        <div class="product-meta">Age 0–5 years &nbsp;·&nbsp; Birth cert needed &nbsp;·&nbsp; Mumbai</div>
+        <div class="product-tags"><span class="product-tag">Child</span><span class="product-tag">New</span></div>
+        <div class="product-footer"><div class="product-price free">FREE</div>
+        <button class="product-action-btn" data-ocid="products.item.2.button">Book</button></div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.3">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap"><img src="/assets/generated/category-aadhaar.dim_600x400.jpg" alt="Address Update"/></div>
+      <div class="product-body">
+        <div class="product-name">Address Update Service</div>
+        <div class="product-meta">Home visit for address update &nbsp;·&nbsp; Bangalore</div>
+        <div class="product-tags"><span class="product-tag">Update</span><span class="product-tag">Address</span></div>
+        <div class="product-footer"><div class="product-price">₹50 Govt Fee</div>
+        <button class="product-action-btn" data-ocid="products.item.3.button">Book</button></div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.4">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap"><img src="/assets/generated/category-aadhaar.dim_600x400.jpg" alt="Name Correction"/></div>
+      <div class="product-body">
+        <div class="product-name">Name Correction / Spelling Fix</div>
+        <div class="product-meta">Document required &nbsp;·&nbsp; Hyderabad</div>
+        <div class="product-tags"><span class="product-tag">Correction</span><span class="product-tag">Name</span></div>
+        <div class="product-footer"><div class="product-price">₹50 Govt Fee</div>
+        <button class="product-action-btn" data-ocid="products.item.4.button">Book</button></div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.5">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap"><img src="/assets/generated/category-aadhaar.dim_600x400.jpg" alt="Photo Update"/></div>
+      <div class="product-body">
+        <div class="product-name">Biometric / Photo Update</div>
+        <div class="product-meta">Fingerprint + Iris + Photo &nbsp;·&nbsp; Chennai</div>
+        <div class="product-tags"><span class="product-tag">Biometric</span><span class="product-tag">Update</span></div>
+        <div class="product-footer"><div class="product-price">₹100 Govt Fee</div>
+        <button class="product-action-btn" data-ocid="products.item.5.button">Book</button></div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.6">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap"><img src="/assets/generated/category-aadhaar.dim_600x400.jpg" alt="DOB Correction"/></div>
+      <div class="product-body">
+        <div class="product-name">Date of Birth Correction</div>
+        <div class="product-meta">Birth cert / school cert needed &nbsp;·&nbsp; Pune</div>
+        <div class="product-tags"><span class="product-tag">Correction</span><span class="product-tag">DOB</span></div>
+        <div class="product-footer"><div class="product-price">₹50 Govt Fee</div>
+        <button class="product-action-btn" data-ocid="products.item.6.button">Book</button></div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.7">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap"><img src="/assets/generated/category-aadhaar.dim_600x400.jpg" alt="eAadhaar Download"/></div>
+      <div class="product-body">
+        <div class="product-name">eAadhaar Download &amp; Print Assistance</div>
+        <div class="product-meta">Doorstep help with UIDAI portal &nbsp;·&nbsp; Kolkata</div>
+        <div class="product-tags"><span class="product-tag">Download</span><span class="product-tag">eAadhaar</span></div>
+        <div class="product-footer"><div class="product-price free">FREE</div>
+        <button class="product-action-btn" data-ocid="products.item.7.button">Book</button></div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.8">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap"><img src="/assets/generated/category-aadhaar.dim_600x400.jpg" alt="Mobile Link"/></div>
+      <div class="product-body">
+        <div class="product-name">Mobile Number Linking / Update</div>
+        <div class="product-meta">Link new SIM to Aadhaar &nbsp;·&nbsp; Jaipur</div>
+        <div class="product-tags"><span class="product-tag">Mobile</span><span class="product-tag">Linking</span></div>
+        <div class="product-footer"><div class="product-price">₹50 Govt Fee</div>
+        <button class="product-action-btn" data-ocid="products.item.8.button">Book</button></div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.9">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap"><img src="/assets/generated/category-aadhaar.dim_600x400.jpg" alt="Aadhaar Lock"/></div>
+      <div class="product-body">
+        <div class="product-name">Aadhaar Lock / Unlock Service</div>
+        <div class="product-meta">Security lock guidance &nbsp;·&nbsp; Pan India (Online)</div>
+        <div class="product-tags"><span class="product-tag">Security</span><span class="product-tag">Lock</span></div>
+        <div class="product-footer"><div class="product-price free">FREE</div>
+        <button class="product-action-btn" data-ocid="products.item.9.button">Book</button></div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.10">
+      <span class="product-badge urgent">Most Needed</span>
+      <div class="product-img-wrap"><img src="/assets/generated/category-aadhaar.dim_600x400.jpg" alt="Senior Assistance"/></div>
+      <div class="product-body">
+        <div class="product-name">Senior Citizen Doorstep Aadhaar Help</div>
+        <div class="product-meta">Home visit, fully assisted &nbsp;·&nbsp; Pan India</div>
+        <div class="product-tags"><span class="product-tag">Senior</span><span class="product-tag">Doorstep</span></div>
+        <div class="product-footer"><div class="product-price free">FREE Service</div>
+        <button class="product-action-btn" data-ocid="products.item.10.button">Book</button></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer style="background:rgba(5,10,20,0.98);border-top:1px solid var(--glass-border);padding:2rem;text-align:center;position:relative;z-index:5;">
+  <p style="color:var(--text-muted);font-size:0.85rem;">© 2025 HelpMatrix. <a href="landing.html" style="color:var(--accent-blue);">Back to Home</a> &nbsp;|&nbsp; Emergency: 112</p>
+</footer>
+
+<button class="back-to-top" id="backToTop" data-ocid="page.back_to_top.button">↑</button>
+<div id="toast" class="toast" data-ocid="page.toast"></div>
+<script src="main.js"></script>
+<script>
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

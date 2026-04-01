@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>HelpMatrix - Blood Bank</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<canvas id="particles-canvas"></canvas>
+
+<nav class="navbar" data-ocid="nav.panel">
+  <a href="landing.html" class="nav-logo" data-ocid="nav.home.link">
+    <img src="/assets/generated/helpmatrix-logo-transparent.dim_400x150.png" alt="HelpMatrix Logo"/>
+    <span class="nav-logo-text">HelpMatrix</span>
+  </a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="landing.html" data-ocid="nav.home.link">Home</a></li>
+    <li><a href="landing.html#categories" data-ocid="nav.categories.link">Categories</a></li>
+    <li><a href="index.html" class="nav-cta" data-ocid="nav.login.button">Login</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" data-ocid="nav.toggle"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="category-hero" data-ocid="category.hero.panel">
+  <div class="category-hero-bg">
+    <img src="/assets/generated/category-blood.dim_600x400.jpg" alt="Blood Bank"/>
+  </div>
+  <div class="category-hero-content">
+    <span class="category-hero-icon">🩸</span>
+    <h1 class="category-hero-title" style="background:linear-gradient(135deg,#ef4444,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Blood Bank</h1>
+    <p class="category-hero-desc">Find blood donors and banks near you. Every second counts — our network responds in minutes.</p>
+    <a href="index.html" class="btn-danger" data-ocid="category.request.button">Emergency Blood Request</a>
+  </div>
+</div>
+
+<div class="products-section" data-ocid="products.section">
+  <div class="products-toolbar">
+    <div class="products-count">Showing <strong>10</strong> blood resources</div>
+    <div class="products-filters">
+      <button class="filter-btn active" data-ocid="products.all.tab">All Groups</button>
+      <button class="filter-btn" data-ocid="products.apos.tab">A+</button>
+      <button class="filter-btn" data-ocid="products.bpos.tab">B+</button>
+      <button class="filter-btn" data-ocid="products.opos.tab">O+</button>
+      <button class="filter-btn" data-ocid="products.abpos.tab">AB+</button>
+    </div>
+  </div>
+  <div class="products-grid" data-ocid="products.list">
+
+    <div class="product-card" data-ocid="products.item.1">
+      <span class="product-badge urgent">Urgent Need</span>
+      <div class="product-img-wrap"><img src="/assets/generated/category-blood.dim_600x400.jpg" alt="O+ Blood"/></div>
+      <div class="product-body">
+        <div class="product-name">O+ Blood Donor Available</div>
+        <div class="product-meta">Last donated: 4 months ago &nbsp;·&nbsp; AIIMS Area, Delhi</div>
+        <div class="product-tags"><span class="product-tag">O+</span><span class="product-tag">Donor</span></div>
+        <div class="product-footer"><div class="product-price" style="color:#ef4444;">O+ Group</div>
+        <button class="product-action-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);" data-ocid="products.item.1.button">Contact</button></div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.2">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap"><img src="/assets/generated/product-blood-bag.dim_400x300.jpg" alt="A+ Blood"/></div>
+      <div class="product-body">
+        <div class="product-name">A+ Blood — Apollo Blood Bank</div>
+        <div class="product-meta">Available units: 8 &nbsp;·&nbsp; Apollo Hospital, Mumbai</div>
+        <div class="product-tags"><span class="product-tag">A+</span><span class="product-tag">Blood Bank</span></div>
+        <div class="product-footer"><div class="product-price" style="color:#ef4444;">A+ Group</div>
+        <button class="product-action-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);" data-ocid="products.item.2.button">Contact</button></div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.3">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap"><img src="/assets/generated/category-blood.dim_600x400.jpg" alt="B+ Blood"/></div>
+      <div class="product-body">
+        <div class="product-name">B+ Volunteer Donor</div>
+        <div class="product-meta">Healthy, 28 yrs &nbsp;·&nbsp; Pune, Hinjewadi</div>
+        <div class="product-tags"><span class="product-tag">B+</span><span class="product-tag">Donor</span></div>
+        <div class="product-footer"><div class="product-price" style="color:#ef4444;">B+ Group</div>
+        <button class="product-action-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);" data-ocid="products.item.3.button">Contact</button></div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.4">
+      <span class="product-badge urgent">Rare</span>
+      <div class="product-img-wrap"><img src="/assets/generated/product-blood-bag.dim_400x300.jpg" alt="AB- Blood"/></div>
+      <div class="product-body">
+        <div class="product-name">AB– Rare Blood Group Donor</div>
+        <div class="product-meta">Rare type &nbsp;·&nbsp; Bangalore, Koramangala</div>
+        <div class="product-tags"><span class="product-tag">AB-</span><span class="product-tag">Rare</span></div>
+        <div class="product-footer"><div class="product-price" style="color:#ef4444;">AB- Group</div>
+        <button class="product-action-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);" data-ocid="products.item.4.button">Contact</button></div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.5">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap"><img src="/assets/generated/category-blood.dim_600x400.jpg" alt="Red Cross"/></div>
+      <div class="product-body">
+        <div class="product-name">Red Cross Blood Bank — Delhi</div>
+        <div class="product-meta">All groups available &nbsp;·&nbsp; Open 24/7 &nbsp;·&nbsp; Connaught Place</div>
+        <div class="product-tags"><span class="product-tag">All Groups</span><span class="product-tag">24/7</span></div>
+        <div class="product-footer"><div class="product-price" style="color:#ef4444;">All Groups</div>
+        <button class="product-action-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);" data-ocid="products.item.5.button">Contact</button></div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.6">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap"><img src="/assets/generated/product-blood-bag.dim_400x300.jpg" alt="O- Blood"/></div>
+      <div class="product-body">
+        <div class="product-name">O– Universal Donor</div>
+        <div class="product-meta">Universal donor blood &nbsp;·&nbsp; Hyderabad</div>
+        <div class="product-tags"><span class="product-tag">O-</span><span class="product-tag">Universal</span></div>
+        <div class="product-footer"><div class="product-price" style="color:#ef4444;">O- Group</div>
+        <button class="product-action-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);" data-ocid="products.item.6.button">Contact</button></div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.7">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap"><img src="/assets/generated/category-blood.dim_600x400.jpg" alt="Platelets"/></div>
+      <div class="product-body">
+        <div class="product-name">Platelets — Thalassemia Support</div>
+        <div class="product-meta">Platelet donation available &nbsp;·&nbsp; Chennai</div>
+        <div class="product-tags"><span class="product-tag">Platelets</span><span class="product-tag">Thalassemia</span></div>
+        <div class="product-footer"><div class="product-price" style="color:#ef4444;">Platelets</div>
+        <button class="product-action-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);" data-ocid="products.item.7.button">Contact</button></div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.8">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap"><img src="/assets/generated/product-blood-bag.dim_400x300.jpg" alt="AB+ Blood"/></div>
+      <div class="product-body">
+        <div class="product-name">AB+ Donor — Emergency Ready</div>
+        <div class="product-meta">Responds in 1 hour &nbsp;·&nbsp; Kolkata, Salt Lake</div>
+        <div class="product-tags"><span class="product-tag">AB+</span><span class="product-tag">Fast Response</span></div>
+        <div class="product-footer"><div class="product-price" style="color:#ef4444;">AB+ Group</div>
+        <button class="product-action-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);" data-ocid="products.item.8.button">Contact</button></div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.9">
+      <span class="product-badge">Available</span>
+      <div class="product-img-wrap"><img src="/assets/generated/category-blood.dim_600x400.jpg" alt="Blood Drive"/></div>
+      <div class="product-body">
+        <div class="product-name">Community Blood Drive Camp</div>
+        <div class="product-meta">Multi-city camps every weekend &nbsp;·&nbsp; Pan India</div>
+        <div class="product-tags"><span class="product-tag">Camp</span><span class="product-tag">Community</span></div>
+        <div class="product-footer"><div class="product-price free">FREE</div>
+        <button class="product-action-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);" data-ocid="products.item.9.button">Register</button></div>
+      </div>
+    </div>
+
+    <div class="product-card" data-ocid="products.item.10">
+      <span class="product-badge urgent">Critical</span>
+      <div class="product-img-wrap"><img src="/assets/generated/product-blood-bag.dim_400x300.jpg" alt="B- Blood"/></div>
+      <div class="product-body">
+        <div class="product-name">B– Critical Need — PGIMER</div>
+        <div class="product-meta">Patient in surgery &nbsp;·&nbsp; Chandigarh, PGIMER</div>
+        <div class="product-tags"><span class="product-tag">B-</span><span class="product-tag">Critical</span></div>
+        <div class="product-footer"><div class="product-price" style="color:#ef4444;">B- Group</div>
+        <button class="product-action-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);" data-ocid="products.item.10.button">Help Now</button></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer style="background:rgba(5,10,20,0.98);border-top:1px solid var(--glass-border);padding:2rem;text-align:center;position:relative;z-index:5;">
+  <p style="color:var(--text-muted);font-size:0.85rem;">© 2025 HelpMatrix. <a href="landing.html" style="color:var(--accent-blue);">Back to Home</a> &nbsp;|&nbsp; Emergency: 112</p>
+</footer>
+
+<button class="back-to-top" id="backToTop" data-ocid="page.back_to_top.button">↑</button>
+<div id="toast" class="toast" data-ocid="page.toast"></div>
+<script src="main.js"></script>
+<script>
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
