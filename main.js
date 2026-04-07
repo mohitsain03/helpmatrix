@@ -225,7 +225,39 @@ function initModals() {
   });
 }
 
-// ---- LOGIN PAGE ----
+// ---- AUTHENTICATION & SESSION ----
+function initAuth() {
+  const userStr = localStorage.getItem('helpmatrix_user');
+  if (userStr) {
+    try {
+      const user = JSON.parse(userStr);
+      const navLinks = document.getElementById('nav-links');
+      if (navLinks) {
+        // Find Login button
+        const loginBtn = navLinks.querySelector('a[href="login.html"]');
+        if (loginBtn) {
+          const li = loginBtn.parentElement;
+          li.innerHTML = `<a href="dashboard.html" class="nav-cta" style="background: linear-gradient(135deg, #8b5cf6, #3b82f6);">Dashboard</a>`;
+          
+          const logoutLi = document.createElement('li');
+          logoutLi.innerHTML = `<a href="#" id="nav-logout" style="color:var(--accent-red);font-weight:600;text-decoration:none;">Logout</a>`;
+          navLinks.appendChild(logoutLi);
+
+          document.getElementById('nav-logout').addEventListener('click', e => {
+            e.preventDefault();
+            localStorage.removeItem('helpmatrix_user');
+            window.location.href = 'index.html';
+          });
+        }
+      }
+    } catch (e) {
+      console.warn("Invalid user data in storage, clearing it.");
+      localStorage.removeItem('helpmatrix_user');
+    }
+  }
+}
+
+// ---- LOGIN & REGISTER PAGE ----
 function initLoginPage() {
   const roleTabs = document.querySelectorAll('.role-tab');
   const authTabs = document.querySelectorAll('.auth-tab');
@@ -237,14 +269,16 @@ function initLoginPage() {
   let currentRole = 'consumer';
   let currentAuthMode = 'login';
 
+  // Check URL params for provider
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('provider') === 'true') {
+    currentRole = 'provider';
+  }
+
   function updateView() {
-    if (providerFields) {
-      providerFields.style.display = (currentRole === 'provider' && currentAuthMode === 'register') ? 'block' : 'none';
-    }
-    if (loginFormFields && registerFormFields) {
-      loginFormFields.style.display = currentAuthMode === 'login' ? 'block' : 'none';
-      registerFormFields.style.display = currentAuthMode === 'register' ? 'block' : 'none';
-    }
+    if (providerFields) providerFields.style.display = (currentRole === 'provider' && currentAuthMode === 'register') ? 'block' : 'none';
+    if (loginFormFields) loginFormFields.style.display = currentAuthMode === 'login' ? 'block' : 'none';
+    if (registerFormFields) registerFormFields.style.display = currentAuthMode === 'register' ? 'block' : 'none';
     if (formTitle) {
       const roleLabel = currentRole === 'consumer' ? 'Consumer' : 'Provider';
       formTitle.textContent = currentAuthMode === 'login' ? `${roleLabel} Login` : `${roleLabel} Registration`;
@@ -252,6 +286,9 @@ function initLoginPage() {
   }
 
   roleTabs.forEach(tab => {
+    if (tab.getAttribute('data-role') === currentRole) tab.classList.add('active');
+    else tab.classList.remove('active');
+
     tab.addEventListener('click', () => {
       roleTabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
@@ -273,12 +310,33 @@ function initLoginPage() {
   if (loginForm) {
     loginForm.addEventListener('submit', e => {
       e.preventDefault();
+      const mobileInput = document.getElementById('login-mobile');
+      const passwordInput = document.getElementById('login-password');
+      const mobile = mobileInput ? mobileInput.value.trim() : '';
+      const password = passwordInput ? passwordInput.value : '';
+
+      if (!mobile || !password) {
+        showToast('Please enter mobile number and password.', 'error');
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem('helpmatrix_users') || '[]');
+      const user = users.find(u => u.mobile === mobile && u.password === password && u.role === currentRole);
+
+      if (!user) {
+        showToast('Invalid credentials or role mismatch!', 'error');
+        return;
+      }
+
       const btn = loginForm.querySelector('.submit-btn');
       btn.textContent = 'Authenticating...';
       btn.disabled = true;
+
+      localStorage.setItem('helpmatrix_user', JSON.stringify({ name: user.name, role: user.role, mobile: user.mobile }));
+
       setTimeout(() => {
-        showToast('Login successful! Welcome to HelpMatrix');
-        setTimeout(() => { window.location.href = 'landing.html'; }, 800);
+        showToast('Login successful! Welcome back.');
+        setTimeout(() => { window.location.href = 'index.html'; }, 800);
       }, 1200);
     });
   }
@@ -287,31 +345,146 @@ function initLoginPage() {
   if (registerForm) {
     registerForm.addEventListener('submit', e => {
       e.preventDefault();
+      const nameInput = document.getElementById('reg-name');
+      const mobileInput = document.getElementById('reg-mobile');
+      const addressInput = document.getElementById('reg-address');
+      const passwordInput = document.getElementById('reg-password');
+
+      const name = nameInput ? nameInput.value.trim() : 'New User';
+      const mobile = mobileInput ? mobileInput.value.trim() : '';
+      const address = addressInput ? addressInput.value.trim() : '';
+      const password = passwordInput ? passwordInput.value : '';
+
+      if (mobile.length < 10) {
+        showToast('Please enter a valid mobile number (min 10 digits).', 'error');
+        return;
+      }
+      if (password.length < 6) {
+        showToast('Password must be at least 6 characters long.', 'error');
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem('helpmatrix_users') || '[]');
+      if (users.find(u => u.mobile === mobile && u.role === currentRole)) {
+        showToast('User already exists in this role. Please login.', 'error');
+        return;
+      }
+
       const btn = registerForm.querySelector('.submit-btn');
       btn.textContent = 'Creating Account...';
       btn.disabled = true;
+
+      const newUser = { name, mobile, address, password, role: currentRole };
+      users.push(newUser);
+      localStorage.setItem('helpmatrix_users', JSON.stringify(users));
+      localStorage.setItem('helpmatrix_user', JSON.stringify({ name, role: currentRole, mobile }));
+
       setTimeout(() => {
         showToast('Account created! Welcome to HelpMatrix');
-        setTimeout(() => { window.location.href = 'landing.html'; }, 800);
+        setTimeout(() => { window.location.href = 'index.html'; }, 800);
       }, 1400);
     });
   }
 
-  updateView();
+  if (roleTabs.length > 0) updateView();
 }
 
-// ---- PRODUCT ACTIONS ----
+// ---- PRODUCT REQUEST (CHECKOUT WORKFLOW) ----
+let currentRequestItemName = '';
 function initProductActions() {
-  document.querySelectorAll('.product-action-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const card = btn.closest('.product-card');
-      const name = card ? card.querySelector('.product-name').textContent : 'Item';
-      showToast(`"${name}" added to your requests!`);
-      btn.textContent = 'Requested ✓';
-      btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
-      btn.disabled = true;
-    });
+  const modal = document.getElementById('checkout-modal');
+  
+  document.querySelectorAll('.product-action-btn, .btn-primary, .btn-danger, .btn-secondary').forEach(btn => {
+    // Only intercept if it resembles a purchase/request button (not generic links)
+    const text = btn.textContent.toLowerCase();
+    if (btn.classList.contains('product-action-btn') || text.includes('request') || text.includes('book') || text.includes('borrow')) {
+      // Don't intercept auth buttons
+      if (btn.closest('form')) return;
+
+      btn.addEventListener('click', (e) => {
+        const user = localStorage.getItem('helpmatrix_user');
+        
+        // If it's a login link disguised as a button, handle differently
+        if (btn.tagName.toLowerCase() === 'a' && btn.getAttribute('href') === 'login.html') {
+          if (!user) return; // allow normal navigation
+          else {
+            e.preventDefault(); // stop navigation to login, open modal instead
+          }
+        } else {
+          e.preventDefault();
+        }
+
+        if (!user) {
+          showToast('Please login to request items!', 'error');
+          setTimeout(() => window.location.href = 'login.html', 1500);
+          return;
+        }
+
+        const card = btn.closest('.product-card') || btn.closest('.category-hero-content');
+        currentRequestItemName = card ? (card.querySelector('.product-name')?.textContent || card.querySelector('.category-hero-title')?.textContent || 'Emergency Request') : 'Requested Service';
+        
+        if (modal) {
+          document.getElementById('checkout-item-name').textContent = currentRequestItemName;
+          modal.classList.add('active');
+        } else {
+          submitMockOrder(currentRequestItemName, "Default Address");
+        }
+      });
+    }
   });
+
+  if (modal) {
+    const overlay = modal.querySelector('.modal-overlay');
+    const closeBtn = modal.querySelector('.modal-close');
+    const closeBtnText = modal.querySelector('.btn-secondary');
+    const form = document.getElementById('checkout-form');
+    
+    const closeModal = () => {
+      modal.classList.remove('active');
+      if (form) {
+        form.reset();
+        const submitBtn = form.querySelector('.submit-btn');
+        if (submitBtn) { submitBtn.textContent = 'Confirm Request'; submitBtn.disabled = false; }
+      }
+    };
+
+    if (overlay) overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (closeBtnText) closeBtnText.addEventListener('click', closeModal);
+    
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const address = document.getElementById('checkout-address').value;
+        const urgency = document.getElementById('checkout-urgency').value;
+        const submitBtn = form.querySelector('.submit-btn');
+        submitBtn.textContent = 'Processing...';
+        submitBtn.disabled = true;
+
+        setTimeout(() => submitMockOrder(currentRequestItemName, address, urgency), 1200);
+      });
+    }
+  }
+}
+
+function submitMockOrder(itemName, address, urgency = 'Normal') {
+  const orders = JSON.parse(localStorage.getItem('helpmatrix_orders') || '[]');
+  
+  const orderId = 'HM-' + Math.floor(100000 + Math.random() * 900000);
+  const newOrder = {
+    id: orderId,
+    item: itemName,
+    address: address,
+    urgency: urgency,
+    status: 'Pending',
+    date: new Date().toLocaleDateString()
+  };
+  
+  orders.push(newOrder);
+  localStorage.setItem('helpmatrix_orders', JSON.stringify(orders));
+  sessionStorage.setItem('helpmatrix_last_order', JSON.stringify(newOrder));
+  
+  window.location.href = 'confirmation.html';
 }
 
 // ---- INIT ----
@@ -322,10 +495,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initBackToTop();
   initCounters();
   initModals();
+  initAuth(); // NEW
   initLoginPage();
   initProductActions();
 
-  // Three.js loads from CDN - try after short delay
   setTimeout(() => {
     if (typeof THREE !== 'undefined') initThreeHero();
     else {

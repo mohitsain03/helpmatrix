@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>HelpMatrix - Order Confirmed</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+<canvas id="particles-canvas"></canvas>
+
+<!-- NAVBAR -->
+<nav class="navbar" data-ocid="nav.panel">
+  <a href="index.html" class="nav-logo">
+    <img src="/assets/generated/helpmatrix-logo-transparent.dim_400x150.png" alt="HelpMatrix Logo"/>
+    <span class="nav-logo-text">HelpMatrix</span>
+  </a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="dashboard.html" class="nav-cta" style="background: linear-gradient(135deg, #8b5cf6, #3b82f6);">Dashboard</a></li>
+  </ul>
+</nav>
+
+<div class="success-container">
+  <div class="success-card">
+    <div class="success-icon">✓</div>
+    <h1 style="font-family:'Orbitron',monospace;font-size:2rem;color:#fff;margin-bottom:1rem;">Request Confirmed!</h1>
+    <p style="color:var(--text-muted);font-size:1rem;line-height:1.6;margin-bottom:2rem;">
+      Your emergency request has been successfully submitted to our network. A relevant provider in your area will be matched shortly.
+    </p>
+    
+    <div style="background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);border-radius:12px;padding:1.5rem;text-align:left;margin-bottom:2rem;">
+      <div style="color:var(--text-muted);font-size:0.85rem;margin-bottom:0.25rem;">Reference ID</div>
+      <div id="conf-id" style="font-family:monospace;font-size:1.5rem;font-weight:700;color:var(--accent-cyan);margin-bottom:1rem;">HM-XXXXXX</div>
+      
+      <div style="color:var(--text-muted);font-size:0.85rem;margin-bottom:0.25rem;">Requested Item/Service</div>
+      <div id="conf-item" style="font-size:1rem;color:#fff;font-weight:600;">Loading...</div>
+    </div>
+    
+    <a href="dashboard.html" class="btn-primary" style="width:100%;text-align:center;">View in Dashboard</a>
+  </div>
+</div>
+
+<script src="main.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Fire confetti!
+    var duration = 3 * 1000;
+    var animationEnd = Date.now() + duration;
+    var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+    function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+    var interval = setInterval(function() {
+      var timeLeft = animationEnd - Date.now();
+      if (timeLeft <= 0) return clearInterval(interval);
+      var particleCount = 50 * (timeLeft / duration);
+      confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+      confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+    }, 250);
+
+    // Populate order details
+    const orderStr = sessionStorage.getItem('helpmatrix_last_order');
+    if (orderStr) {
+      const order = JSON.parse(orderStr);
+      document.getElementById('conf-id').textContent = order.id;
+      document.getElementById('conf-item').textContent = order.item;
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>HelpMatrix - Dashboard</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<canvas id="particles-canvas"></canvas>
+
+<!-- NAVBAR -->
+<nav class="navbar" data-ocid="nav.panel">
+  <a href="index.html" class="nav-logo">
+    <img src="/assets/generated/helpmatrix-logo-transparent.dim_400x150.png" alt="HelpMatrix Logo"/>
+    <span class="nav-logo-text">HelpMatrix</span>
+  </a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="index.html#categories">Categories</a></li>
+    <li><a href="index.html#about">About</a></li>
+    <!-- The initAuth script will populate Dashboard/Logout links here -->
+    <li><a href="login.html" class="nav-cta">Login</a></li>
+  </ul>
+</nav>
+
+<!-- DASHBOARD LAYOUT -->
+<div class="dashboard-layout">
+  
+  <!-- SIDEBAR -->
+  <div class="dashboard-sidebar">
+    <div class="dashboard-userinfo">
+      <div class="dash-avatar" id="dash-avatar">U</div>
+      <div>
+        <div style="font-weight:700;color:#fff;" id="dash-name">User Name</div>
+        <div style="font-size:0.8rem;color:var(--text-muted);" id="dash-role">Consumer</div>
+      </div>
+    </div>
+    
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:1rem;">
+      <li><a href="#" style="color:#fff;text-decoration:none;font-weight:600;display:flex;align-items:center;gap:0.75rem;"><span style="color:var(--accent-blue);">📦</span> My Requests</a></li>
+      <li><a href="index.html#categories" style="color:var(--text-muted);text-decoration:none;font-weight:500;display:flex;align-items:center;gap:0.75rem;"><span>🔍</span> Browse Catalog</a></li>
+      <li><a href="#" style="color:var(--text-muted);text-decoration:none;font-weight:500;display:flex;align-items:center;gap:0.75rem;"><span>⚙️</span> Settings</a></li>
+    </ul>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="dash-content">
+    <h2 style="font-family:'Orbitron',monospace;font-size:2rem;margin-bottom:2rem;color:#fff;">Active Orders / Requests</h2>
+    
+    <div id="orders-container">
+      <!-- Orders dynamically loaded here -->
+    </div>
+  </div>
+
+</div>
+
+<script src="main.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Load User Data
+    const userStr = localStorage.getItem('helpmatrix_user');
+    if (!userStr) {
+      window.location.href = 'login.html';
+      return;
+    }
+    const user = JSON.parse(userStr);
+    
+    document.getElementById('dash-name').textContent = user.name || 'User';
+    document.getElementById('dash-role').textContent = user.role === 'provider' ? 'Provider Account' : 'Consumer Account';
+    document.getElementById('dash-avatar').textContent = (user.name || 'U').charAt(0).toUpperCase();
+
+    // Load Orders
+    const ordersContainer = document.getElementById('orders-container');
+    const orders = JSON.parse(localStorage.getItem('helpmatrix_orders') || '[]');
+    
+    if (orders.length === 0) {
+      ordersContainer.innerHTML = `
+        <div style="text-align:center;padding:4rem 2rem;background:var(--glass-bg);border:1px dashed var(--glass-border);border-radius:16px;">
+          <div style="font-size:3rem;margin-bottom:1rem;">📭</div>
+          <h3 style="color:#fff;margin-bottom:0.5rem;">No Active Requests</h3>
+          <p style="color:var(--text-muted);margin-bottom:1.5rem;">You haven't made any requests yet.</p>
+          <a href="index.html#categories" class="btn-primary">Browse Services</a>
+        </div>
+      `;
+    } else {
+      let ordersHtml = '';
+      // Reverse array so latest is first
+      [...orders].reverse().forEach(order => {
+        let statusColor = order.status === 'Pending' ? '#eab308' : (order.status === 'Processing' ? '#3b82f6' : '#22c55e');
+        
+        ordersHtml += `
+          <div class="dash-card">
+            <div>
+              <div style="color:var(--text-muted);font-size:0.8rem;margin-bottom:0.25rem;">Order ID: <span style="font-family:monospace;color:#fff;">${order.id}</span> • ${order.date}</div>
+              <h4>${order.item}</h4>
+              <p>Address: ${order.address} • Urgency: <strong style="color:var(--accent-red);">${order.urgency}</strong></p>
+            </div>
+            <div>
+              <span class="status" style="background:rgba(234, 179, 8, 0.15);color:${statusColor};">${order.status}</span>
+            </div>
+          </div>
+        `;
+      });
+      ordersContainer.innerHTML = ordersHtml;
+    }
+  });
+</script>
+</body>
+</html>

@@ -10,14 +10,14 @@
 <canvas id="particles-canvas"></canvas>
 
 <nav class="navbar" data-ocid="nav.panel">
-  <a href="landing.html" class="nav-logo" data-ocid="nav.home.link">
+  <a href="index.html" class="nav-logo" data-ocid="nav.home.link">
     <img src="/assets/generated/helpmatrix-logo-transparent.dim_400x150.png" alt="HelpMatrix Logo"/>
     <span class="nav-logo-text">HelpMatrix</span>
   </a>
   <ul class="nav-links" id="nav-links">
-    <li><a href="landing.html" data-ocid="nav.home.link">Home</a></li>
-    <li><a href="landing.html#categories" data-ocid="nav.categories.link">Categories</a></li>
-    <li><a href="index.html" class="nav-cta" data-ocid="nav.login.button">Login</a></li>
+    <li><a href="index.html" data-ocid="nav.home.link">Home</a></li>
+    <li><a href="index.html#categories" data-ocid="nav.categories.link">Categories</a></li>
+    <li><a href="login.html" class="nav-cta" data-ocid="nav.login.button">Login</a></li>
   </ul>
   <button class="hamburger" id="hamburger" data-ocid="nav.toggle"><span></span><span></span><span></span></button>
 </nav>
@@ -30,7 +30,7 @@
     <span class="category-hero-icon">🩸</span>
     <h1 class="category-hero-title" style="background:linear-gradient(135deg,#ef4444,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Blood Bank</h1>
     <p class="category-hero-desc">Find blood donors and banks near you. Every second counts — our network responds in minutes.</p>
-    <a href="index.html" class="btn-danger" data-ocid="category.request.button">Emergency Blood Request</a>
+    <a href="login.html" class="btn-danger" data-ocid="category.request.button">Emergency Blood Request</a>
   </div>
 </div>
 
@@ -171,11 +171,41 @@
 </div>
 
 <footer style="background:rgba(5,10,20,0.98);border-top:1px solid var(--glass-border);padding:2rem;text-align:center;position:relative;z-index:5;">
-  <p style="color:var(--text-muted);font-size:0.85rem;">© 2025 HelpMatrix. <a href="landing.html" style="color:var(--accent-blue);">Back to Home</a> &nbsp;|&nbsp; Emergency: 112</p>
+  <p style="color:var(--text-muted);font-size:0.85rem;">© 2025 HelpMatrix. <a href="index.html" style="color:var(--accent-blue);">Back to Home</a> &nbsp;|&nbsp; Emergency: 112</p>
 </footer>
 
 <button class="back-to-top" id="backToTop" data-ocid="page.back_to_top.button">↑</button>
 <div id="toast" class="toast" data-ocid="page.toast"></div>
+<!-- CHECKOUT MODAL -->
+<div id="checkout-modal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 class="modal-title">Request Item</h3>
+      <button class="modal-close" style="background:none;border:none;font-size:1.5rem;color:var(--text-muted);cursor:pointer;">&times;</button>
+    </div>
+    <form id="checkout-form">
+      <p style="color:var(--text-muted);margin-bottom:1.5rem;font-size:0.9rem;">
+        You are requesting: <strong id="checkout-item-name" style="color:var(--accent-blue);">Item Name</strong>
+      </p>
+      <div class="form-group">
+        <label class="form-label">Delivery / Pickup Address</label>
+        <textarea id="checkout-address" class="form-input" rows="2" placeholder="Enter your full address..." required></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Urgency</label>
+        <select id="checkout-urgency" class="form-select">
+          <option value="Normal">Normal (2-3 Days)</option>
+          <option value="High">High (Within 24 Hours)</option>
+          <option value="Critical">Critical (Immediate)</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:1rem;margin-top:2rem;">
+        <button type="button" class="btn-secondary" style="flex:1;">Cancel</button>
+        <button type="submit" class="submit-btn" style="flex:1;margin-top:0;">Confirm Request</button>
+      </div>
+    </form>
+  </div>
+</div>
 <script src="main.js"></script>
 <script>
   document.querySelectorAll('.filter-btn').forEach(btn => {

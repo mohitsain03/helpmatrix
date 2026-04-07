@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>HelpMatrix - Emergency Help Platform</title>
+  <meta name="description" content="HelpMatrix - Your trusted emergency help platform. Find clothing, blood banks, electronics, household workers and more."/>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+</head>
+<body>
+
+<canvas id="particles-canvas"></canvas>
+
+<!-- NAVBAR -->
+<nav class="navbar" data-ocid="nav.panel">
+  <a href="login.html" class="nav-logo" data-ocid="nav.link">
+    <img src="/assets/generated/helpmatrix-logo-transparent.dim_400x150.png" alt="HelpMatrix Logo"/>
+    <span class="nav-logo-text">HelpMatrix</span>
+  </a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="index.html" data-ocid="nav.landing.link">Home</a></li>
+    <li><a href="index.html#categories" data-ocid="nav.categories.link">Categories</a></li>
+    <li><a href="index.html#about" data-ocid="nav.about.link">About</a></li>
+    <li><a href="index.html#contact" data-ocid="nav.contact.link">Contact</a></li>
+    <li><a href="login.html" class="nav-cta" data-ocid="nav.login.button">Login / Sign Up</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Menu" data-ocid="nav.toggle">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- LOGIN PAGE -->
+<div class="login-page">
+  <div class="login-container">
+    <!-- Logo -->
+    <div class="login-logo">
+      <img src="/assets/generated/helpmatrix-logo-transparent.dim_400x150.png" alt="HelpMatrix"/>
+      <span class="login-logo-text">HelpMatrix</span>
+      <p>India's #1 Emergency Help Platform</p>
+    </div>
+
+    <!-- Card -->
+    <div class="login-card">
+
+      <!-- Role Selection -->
+      <div class="role-tabs" data-ocid="login.role.panel">
+        <button class="role-tab active" data-role="consumer" data-ocid="login.consumer.tab">
+          👤 Consumer
+        </button>
+        <button class="role-tab" data-role="provider" data-ocid="login.provider.tab">
+          🏪 Provider
+        </button>
+      </div>
+
+      <!-- Login / Register Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-auth="login" data-ocid="login.login.tab">Login</button>
+        <button class="auth-tab" data-auth="register" data-ocid="login.register.tab">Register</button>
+      </div>
+
+      <h2 id="form-title" style="font-size:1.1rem;font-weight:700;margin-bottom:1.25rem;color:#fff;">Consumer Login</h2>
+
+      <!-- LOGIN FORM -->
+      <div id="login-form-fields">
+        <form id="login-form">
+          <div class="form-group">
+            <label class="form-label" for="login-mobile">Mobile Number</label>
+            <input class="form-input" type="text" id="login-mobile" name="mobile"
+              placeholder="Enter your mobile number or username" required
+              data-ocid="login.mobile.input"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <input class="form-input" type="password" id="login-password" name="password"
+              placeholder="Enter your password" required data-ocid="login.password.input"/>
+          </div>
+          <button type="submit" class="submit-btn" data-ocid="login.submit.button">Login to HelpMatrix</button>
+        </form>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div id="register-form-fields" style="display:none;">
+        <form id="register-form">
+          <div class="form-group">
+            <label class="form-label" for="reg-name">Full Name</label>
+            <input class="form-input" type="text" id="reg-name" name="name"
+              placeholder="Your full name" required data-ocid="register.name.input"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-mobile">Mobile Number</label>
+            <input class="form-input" type="text" id="reg-mobile" name="mobile"
+              placeholder="Mobile number or username" required
+              data-ocid="register.mobile.input"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-address">Address</label>
+            <input class="form-input" type="text" id="reg-address" name="address"
+              placeholder="Your full address" required data-ocid="register.address.input"/>
+          </div>
+
+          <!-- Provider-only fields -->
+          <div id="provider-fields">
+            <div class="form-group">
+              <label class="form-label" for="reg-category">Service Categories</label>
+              <select class="form-select" id="reg-category" name="category" data-ocid="register.category.select">
+                <option value="">-- Select Category --</option>
+                <option value="clothing">👕 Clothing</option>
+                <option value="blood-bank">🩸 Blood Bank</option>
+                <option value="aadhaar">🪪 Aadhaar Number Services</option>
+                <option value="electronics">💻 Electronics</option>
+                <option value="emergency">🚨 Emergency Helpline</option>
+                <option value="household">🏠 Household Workers</option>
+                <option value="medical">💊 Medical Supplies</option>
+                <option value="food">🍱 Food & Ration</option>
+                <option value="transport">🚗 Transport</option>
+                <option value="other">📦 Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-org">Organization / Business Name</label>
+              <input class="form-input" type="text" id="reg-org" name="org"
+                placeholder="Your organization name" data-ocid="register.org.input"/>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-password">Create Password</label>
+            <input class="form-input" type="password" id="reg-password" name="password"
+              placeholder="Create a strong password" required data-ocid="register.password.input"/>
+          </div>
+          <button type="submit" class="submit-btn" data-ocid="register.submit.button">Create Account</button>
+        </form>
+      </div>
+
+      <p class="login-footer-text">
+        By continuing, you agree to HelpMatrix's
+        <a href="termscondition.html">Terms of Service</a> and <a href="privacypolicy.html">Privacy Policy</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" data-ocid="login.toast"></div>
+<script src="main.js"></script>
+</body>
+</html>
