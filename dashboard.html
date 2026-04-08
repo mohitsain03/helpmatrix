@@ -73,10 +73,12 @@
     // Load Orders
     const ordersContainer = document.getElementById('orders-container');
     const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
+    const userMobile = user.mobile || 'Unknown';
     fetch(`${API_BASE}/api/orders/` + userMobile)
       .then(res => res.json())
       .then(data => {
         let orders = data.success ? data.orders : [];
+        let totalAmount = 0;
         if (orders.length === 0) {
           ordersContainer.innerHTML = `
             <div style="text-align:center;padding:4rem 2rem;background:var(--glass-bg);border:1px dashed var(--glass-border);border-radius:16px;">
@@ -92,12 +94,14 @@
           [...orders].reverse().forEach(order => {
             let statusColor = order.Status === 'Pending' ? '#eab308' : (order.Status === 'Processing' ? '#3b82f6' : '#22c55e');
             // ADODB returns column names as they were defined (OrderID, Status, etc)
-            let oid = order.OrderID || order.ID || order.id;
-            let oitem = order.Item || order.item;
-            let odeliv = order.Address || order.address;
-            let ourg = order.Urgency || order.urgency;
-            let odate = order.OrderDate || order.date;
-            let ostatus = order.Status || order.status;
+            let oid = order.OrderID || order.ID || order.id || 'N/A';
+            let oitem = order.Item || order.item || 'Unknown Item';
+            let odeliv = order.Address || order.address || 'N/A';
+            let ourg = order.Urgency || order.urgency || 'Normal';
+            let odate = order.OrderDate || order.date || 'N/A';
+            let ostatus = order.Status || order.status || 'Pending';
+            let oprice = parseFloat((order.Price || order.price || '0').toString().replace(/[^0-9.]/g, '')) || 0;
+            totalAmount += oprice;
             
             ordersHtml += `
               <div class="dash-card">
@@ -105,6 +109,7 @@
                   <div style="color:var(--text-muted);font-size:0.8rem;margin-bottom:0.25rem;">Order ID: <span style="font-family:monospace;color:#fff;">${oid}</span> • ${odate}</div>
                   <h4>${oitem}</h4>
                   <p>Address: ${odeliv} • Urgency: <strong style="color:var(--accent-red);">${ourg}</strong></p>
+                  <div style="margin-top:0.5rem;font-weight:700;color:var(--accent-cyan);">Price: ₹${oprice.toLocaleString()}</div>
                 </div>
                 <div>
                   <span class="status" style="background:rgba(234, 179, 8, 0.15);color:${statusColor};">${ostatus}</span>
@@ -112,7 +117,21 @@
               </div>
             `;
           });
-          ordersContainer.innerHTML = ordersHtml;
+          
+          const summaryHtml = `
+            <div class="dash-card" style="background:linear-gradient(135deg, rgba(59,130,246,0.1), rgba(6,182,212,0.1)); border-color:var(--accent-blue);">
+              <div>
+                <h3 style="color:#fff;margin-bottom:0.25rem;">Order Summary</h3>
+                <p style="color:var(--text-muted);">Total requests across all categories</p>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:0.8rem;color:var(--text-muted);">Total Amount</div>
+                <div style="font-size:1.8rem;font-weight:800;color:var(--accent-cyan);font-family:'Orbitron',monospace;">₹${totalAmount.toLocaleString()}</div>
+              </div>
+            </div>
+          `;
+          
+          ordersContainer.innerHTML = summaryHtml + ordersHtml;
         }
       })
       .catch(err => {

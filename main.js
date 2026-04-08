@@ -240,7 +240,8 @@ function initAuth() {
         const loginBtn = navLinks.querySelector('a[href="login.html"]');
         if (loginBtn) {
           const li = loginBtn.parentElement;
-          li.innerHTML = `<a href="dashboard.html" class="nav-cta" style="background: linear-gradient(135deg, #8b5cf6, #3b82f6);">Dashboard</a>`;
+          const dashUrl = user.role === 'provider' ? 'provider-dashboard.html' : 'dashboard.html';
+          li.innerHTML = `<a href="${dashUrl}" class="nav-cta" style="background: linear-gradient(135deg, #8b5cf6, #3b82f6);">Dashboard</a>`;
           
           const logoutLi = document.createElement('li');
           logoutLi.innerHTML = `<a href="#" id="nav-logout" style="color:var(--accent-red);font-weight:600;text-decoration:none;">Logout</a>`;
@@ -342,7 +343,7 @@ function initLoginPage() {
         }
         localStorage.setItem('helpmatrix_user', JSON.stringify(data.user));
         showToast('Login successful! Welcome back.');
-        setTimeout(() => { window.location.href = currentRole === 'provider' ? 'dashboard.html' : 'index.html'; }, 800);
+        setTimeout(() => { window.location.href = currentRole === 'provider' ? 'provider-dashboard.html' : 'index.html'; }, 800);
       })
       .catch(err => {
         showToast('Network error', 'error');
@@ -411,6 +412,8 @@ function initLoginPage() {
 
 // ---- PRODUCT REQUEST (CHECKOUT WORKFLOW) ----
 let currentRequestItemName = '';
+let currentRequestItemPrice = '0';
+let currentRequestItemProvider = '';
 function initProductActions() {
   const modal = document.getElementById('checkout-modal');
   
@@ -443,6 +446,12 @@ function initProductActions() {
         const card = btn.closest('.product-card') || btn.closest('.category-hero-content');
         currentRequestItemName = card ? (card.querySelector('.product-name')?.textContent || card.querySelector('.category-hero-title')?.textContent || 'Emergency Request') : 'Requested Service';
         
+        // Extract price and provider
+        const priceEl = card ? card.querySelector('.product-price') : null;
+        const priceText = priceEl ? priceEl.textContent.replace('FREE', '0').replace('₹', '').replace(',', '').trim() : '0';
+        currentRequestItemPrice = priceText;
+        currentRequestItemProvider = card ? (card.getAttribute('data-provider') || 'Not Assigned') : 'Not Assigned';
+
         if (modal) {
           document.getElementById('checkout-item-name').textContent = currentRequestItemName;
           modal.classList.add('active');
@@ -481,13 +490,13 @@ function initProductActions() {
         submitBtn.textContent = 'Processing...';
         submitBtn.disabled = true;
 
-        setTimeout(() => submitMockOrder(currentRequestItemName, address, urgency), 1200);
+        setTimeout(() => submitMockOrder(currentRequestItemName, address, urgency, currentRequestItemPrice, currentRequestItemProvider), 1200);
       });
     }
   }
 }
 
-function submitMockOrder(itemName, address, urgency = 'Normal') {
+function submitMockOrder(itemName, address, urgency = 'Normal', price = '0', provider = '') {
   const userStr = localStorage.getItem('helpmatrix_user');
   let userMobile = 'Unknown';
   if (userStr) {
@@ -502,7 +511,9 @@ function submitMockOrder(itemName, address, urgency = 'Normal') {
     address: address,
     urgency: urgency,
     status: 'Pending',
-    date: new Date().toLocaleDateString()
+    date: new Date().toLocaleDateString(),
+    price: price,
+    providerMobile: provider
   };
   
   fetch(`${API_BASE}/api/orders`, {

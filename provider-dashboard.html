@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>HelpMatrix - Provider Dashboard</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+  <style>
+    .provider-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+    .stat-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; text-align: center; }
+    .stat-val { font-family: 'Orbitron', sans-serif; font-size: 2rem; color: var(--accent-cyan); margin: 0.5rem 0; }
+    .section-title { margin: 3rem 0 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+  </style>
+</head>
+<body class="dashboard-body">
+<canvas id="particles-canvas"></canvas>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">
+    <img src="/assets/generated/helpmatrix-logo-transparent.dim_400x150.png" alt="Logo"/>
+    <span class="nav-logo-text">HelpMatrix</span>
+  </a>
+  <div class="nav-user">
+    <div class="user-info">
+      <div class="user-name" id="dash-user-name">Provider Name</div>
+      <div style="font-size:0.7rem;color:var(--text-muted);" id="dash-role">Provider Account</div>
+    </div>
+    <div class="user-avatar" id="dash-avatar">P</div>
+    <a href="index.html" class="nav-cta" style="background:#ef4444;margin-left:1rem;padding:0.5rem 1rem;" onclick="localStorage.removeItem('helpmatrix_user')">Logout</a>
+  </div>
+</nav>
+
+<div class="dashboard-container">
+  <header class="dash-header">
+    <h1>Welcome, <span id="welcome-name" style="color:var(--accent-blue);">Provider</span></h1>
+    <p style="color:var(--text-muted);">Manage your listings and fulfill incoming requests.</p>
+  </header>
+
+  <!-- STATS -->
+  <div class="provider-grid">
+    <div class="stat-card">
+      <div style="color:var(--text-muted);font-size:0.8rem;">Active Products</div>
+      <div class="stat-val" id="stat-products">0</div>
+    </div>
+    <div class="stat-card">
+      <div style="color:var(--text-muted);font-size:0.8rem;">Pending Orders</div>
+      <div class="stat-val" id="stat-orders" style="color:var(--accent-red);">0</div>
+    </div>
+    <div class="stat-card">
+      <div style="color:var(--text-muted);font-size:0.8rem;">Total Earnings</div>
+      <div class="stat-val" id="stat-earnings" style="color:var(--accent-green);">₹0</div>
+    </div>
+  </div>
+
+  <!-- PENDING ORDERS (INCOMING) -->
+  <div class="section-title">
+    <h2>Pending Orders <span style="font-size:0.9rem;font-weight:400;color:var(--text-muted);" id="orders-count">(0)</span></h2>
+  </div>
+  <div id="orders-container" class="orders-list">
+    <!-- Orders load here -->
+    <p style="color:var(--text-muted);text-align:center;padding:2rem;">Loading pending orders...</p>
+  </div>
+
+  <!-- MY PRODUCTS -->
+  <div class="section-title">
+    <h2>My Products <span style="font-size:0.9rem;font-weight:400;color:var(--text-muted);" id="products-count">(0)</span></h2>
+    <button class="btn-primary" style="padding:0.5rem 1rem;font-size:0.8rem;" onclick="openProductModal()">+ Add Product</button>
+  </div>
+  <div id="products-container" class="orders-list">
+    <!-- Products load here -->
+    <p style="color:var(--text-muted);text-align:center;padding:2rem;">Loading your inventory...</p>
+  </div>
+</div>
+
+<!-- ADD PRODUCT MODAL -->
+<div id="product-modal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 class="modal-title">List New Product</h3>
+      <button class="modal-close" id="close-product-modal" style="background:none;border:none;font-size:1.5rem;color:var(--text-muted);cursor:pointer;">&times;</button>
+    </div>
+    <form id="product-form">
+      <div class="form-group">
+        <label class="form-label">Product Name</label>
+        <input type="text" id="p-name" class="form-input" placeholder="e.g. Winter Jacket" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select id="p-category" class="form-input">
+          <option value="Clothing">Clothing</option>
+          <option value="Medical">Medical</option>
+          <option value="Food">Food</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Price (₹)</label>
+        <input type="number" id="p-price" class="form-input" placeholder="0" required>
+      </div>
+      <div style="display:flex;gap:1rem;margin-top:2rem;">
+        <button type="button" class="btn-secondary" style="flex:1;" id="cancel-product">Cancel</button>
+        <button type="submit" class="submit-btn" style="flex:1;margin-top:0;" id="save-product">Save Listing</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="main.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const userStr = localStorage.getItem('helpmatrix_user');
+    if (!userStr) { window.location.href = 'login.html'; return; }
+    const user = JSON.parse(userStr);
+    
+    // Fill UI
+    document.getElementById('dash-user-name').textContent = user.name;
+    document.getElementById('welcome-name').textContent = user.name.split(' ')[0];
+    document.getElementById('dash-avatar').textContent = (user.name || 'P').charAt(0).toUpperCase();
+
+    const mobile = user.mobile;
+    const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
+
+    // 1. Load Incoming Orders
+    fetch(`${API_BASE}/api/provider/orders/` + mobile)
+      .then(res => res.json())
+      .then(data => {
+        const orders = data.success ? data.orders : [];
+        document.getElementById('stat-orders').textContent = orders.filter(o => o.Status === 'Pending').length;
+        document.getElementById('orders-count').textContent = `(${orders.length})`;
+        
+        let earn = 0;
+        orders.forEach(o => { earn += parseFloat((o.Price || '0').toString().replace(/[^0-9.]/g, '')) || 0; });
+        document.getElementById('stat-earnings').textContent = '₹' + earn.toLocaleString();
+
+        const container = document.getElementById('orders-container');
+        if (orders.length === 0) {
+          container.innerHTML = '<div class="dash-card" style="justify-content:center;color:var(--text-muted);">No orders received yet.</div>';
+        } else {
+          container.innerHTML = orders.map(o => `
+            <div class="dash-card">
+              <div>
+                <div style="color:var(--text-muted);font-size:0.7rem;">Order ID: ${o.OrderID} • ${o.OrderDate}</div>
+                <h4 style="margin:0.25rem 0;">${o.Item}</h4>
+                <p>Consumer: ${o.UserMobile} • Address: ${o.Address}</p>
+                <div style="color:var(--accent-cyan);font-weight:700;margin-top:0.5rem;">Amount: ₹${o.Price}</div>
+              </div>
+              <div style="text-align:right;">
+                <span class="status" style="background:rgba(234,179,8,0.1);color:#eab308;display:block;margin-bottom:0.5rem;">${o.Status}</span>
+                <button class="btn-primary" style="padding:0.4rem 0.8rem;font-size:0.7rem;" onclick="alert('Order Accepted!')">Approve</button>
+              </div>
+            </div>
+          `).join('');
+        }
+      });
+
+    // 2. Load My Products
+    fetch(`${API_BASE}/api/provider/products/` + mobile)
+      .then(res => res.json())
+      .then(data => {
+        const products = data.success ? data.products : [];
+        document.getElementById('stat-products').textContent = products.length;
+        document.getElementById('products-count').textContent = `(${products.length})`;
+
+        const container = document.getElementById('products-container');
+        if (products.length === 0) {
+          container.innerHTML = '<div class="dash-card" style="justify-content:center;color:var(--text-muted);">No products listed yet.</div>';
+        } else {
+          container.innerHTML = products.map(p => `
+            <div class="dash-card">
+              <div>
+                <h4 style="margin-0;">${p.ItemName}</h4>
+                <p>Category: ${p.Category} • Listed Price: ₹${p.Price}</p>
+              </div>
+              <div>
+                <span class="status" style="background:rgba(34,197,94,0.1);color:#22c55e;">${p.Status}</span>
+              </div>
+            </div>
+          `).join('');
+        }
+      });
+  });
+
+  // Modal Logic
+  const pModal = document.getElementById('product-modal');
+  const pForm = document.getElementById('product-form');
+  
+  function openProductModal() { pModal.classList.add('active'); }
+  function closeProductModal() { pModal.classList.add('active'); pModal.classList.remove('active'); }
+  
+  document.getElementById('close-product-modal').onclick = closeProductModal;
+  document.getElementById('cancel-product').onclick = closeProductModal;
+
+  pForm.onsubmit = (e) => {
+    e.preventDefault();
+    const user = JSON.parse(localStorage.getItem('helpmatrix_user'));
+    const btn = document.getElementById('save-product');
+    btn.textContent = 'Saving...';
+    btn.disabled = true;
+
+    const newProduct = {
+      id: 'P-' + Math.floor(Math.random()*100000),
+      mobile: user.mobile,
+      name: document.getElementById('p-name').value,
+      category: document.getElementById('p-category').value,
+      price: document.getElementById('p-price').value,
+      status: 'Active'
+    };
+
+    const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
+    fetch(`${API_BASE}/api/provider/products`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newProduct)
+    })
+    .then(res => res.json())
+    .then(data => {
+      if(data.success) {
+        location.reload(); 
+      } else {
+        alert('Error saving product');
+        btn.textContent = 'Save Listing';
+        btn.disabled = false;
+      }
+    });
+  };
+</script>
+</body>
+</html>
