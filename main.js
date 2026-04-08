@@ -3,7 +3,9 @@
 // =============================================
 
 // ---- API CONFIG ----
-const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
+const API_BASE = (window.location.port !== '3000' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:'))
+  ? 'http://localhost:3000'
+  : '';
 
 // ---- PARTICLES CANVAS ----
 function initParticles() {
@@ -346,7 +348,12 @@ function initLoginPage() {
         setTimeout(() => { window.location.href = currentRole === 'provider' ? 'provider-dashboard.html' : 'index.html'; }, 800);
       })
       .catch(err => {
-        showToast('Network error', 'error');
+        console.error('Login error:', err);
+        if (err.message === 'Failed to fetch') {
+          showToast('Could not connect to server. Please ensure the backend is running.', 'error');
+        } else {
+          showToast('An unexpected error occurred during login.', 'error');
+        }
         btn.textContent = 'Login';
         btn.disabled = false;
       });
@@ -400,7 +407,12 @@ function initLoginPage() {
         setTimeout(() => { window.location.href = currentRole === 'provider' ? 'dashboard.html' : 'index.html'; }, 800);
       })
       .catch(err => {
-        showToast('Network error', 'error');
+        console.error('Registration error:', err);
+        if (err.message === 'Failed to fetch') {
+          showToast('Could not connect to server. Please ensure the backend is running.', 'error');
+        } else {
+          showToast('An unexpected error occurred during registration.', 'error');
+        }
         btn.textContent = 'Create Account';
         btn.disabled = false;
       });

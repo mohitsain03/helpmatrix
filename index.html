@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>HelpMatrix - Home</title>
   <meta name="description" content="HelpMatrix - Your trusted emergency help platform for clothing, blood bank, electronics, household workers and more."/>
+  <meta name="keywords" content="emergency help, blood donation, clothing drive, electronic borrowing, household workers, India emergency, HelpMatrix"/>
   <link rel="stylesheet" href="style.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -15,7 +16,7 @@
 <!-- NAVBAR -->
 <nav class="navbar" data-ocid="nav.panel">
   <a href="index.html" class="nav-logo" data-ocid="nav.home.link">
-    <img src="/assets/generated/helpmatrix-logo-transparent.dim_400x150.png" alt="HelpMatrix Logo"/>
+    <img src="assets/generated/logo.svg" alt="HelpMatrix Logo"/>
     <span class="nav-logo-text">HelpMatrix</span>
   </a>
   <ul class="nav-links" id="nav-links">
@@ -52,7 +53,7 @@
 <section class="hero" style="margin-top:0;min-height:calc(100vh - 110px);">
   <div id="three-canvas"></div>
   <div class="hero-video-bg">
-    <img src="/assets/generated/hero-banner.dim_1600x800.jpg" alt="HelpMatrix Hero" class="hero-img-fallback"/>
+    <img src="assets/generated/hero-banner.jpg" alt="HelpMatrix Hero" class="hero-img-fallback"/>
   </div>
   <div class="hero-overlay"></div>
   <div class="hero-content">
@@ -103,7 +104,7 @@
   <div class="categories-grid" data-ocid="categories.list">
     <!-- Clothing -->
     <a href="clothing.html" class="category-card reveal" data-ocid="categories.clothing.card">
-      <img src="/assets/generated/category-clothing.dim_600x400.jpg" alt="Clothing" class="category-card-img"/>
+      <img src="assets/generated/category-clothing.jpg" alt="Clothing" class="category-card-img"/>
       <div class="category-card-body">
         <span class="category-card-icon">👕</span>
         <div class="category-card-title">Clothing</div>
@@ -114,7 +115,7 @@
 
     <!-- Blood Bank -->
     <a href="blood-bank.html" class="category-card red reveal" data-ocid="categories.blood.card">
-      <img src="/assets/generated/category-blood.dim_600x400.jpg" alt="Blood Bank" class="category-card-img"/>
+      <img src="assets/generated/category-blood.jpg" alt="Blood Bank" class="category-card-img"/>
       <div class="category-card-body">
         <span class="category-card-icon">🩸</span>
         <div class="category-card-title">Blood Bank</div>
@@ -125,7 +126,7 @@
 
     <!-- Aadhaar -->
     <a href="aadhaar.html" class="category-card purple reveal" data-ocid="categories.aadhaar.card">
-      <img src="/assets/generated/category-aadhaar.dim_600x400.jpg" alt="Aadhaar" class="category-card-img"/>
+      <img src="assets/generated/category-aadhaar.jpg" alt="Aadhaar" class="category-card-img"/>
       <div class="category-card-body">
         <span class="category-card-icon">🪪</span>
         <div class="category-card-title">Aadhaar Services</div>
@@ -136,7 +137,7 @@
 
     <!-- Electronics -->
     <a href="electronics.html" class="category-card reveal" data-ocid="categories.electronics.card">
-      <img src="/assets/generated/category-electronics.dim_600x400.jpg" alt="Electronics" class="category-card-img"/>
+      <img src="https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&q=80&w=800" alt="Electronics" class="category-card-img"/>
       <div class="category-card-body">
         <span class="category-card-icon">💻</span>
         <div class="category-card-title">Electronics</div>
@@ -147,7 +148,7 @@
 
     <!-- Emergency Helpline -->
     <a href="emergency.html" class="category-card red reveal" data-ocid="categories.emergency.card">
-      <img src="/assets/generated/category-emergency.dim_600x400.jpg" alt="Emergency" class="category-card-img"/>
+      <img src="https://images.unsplash.com/photo-1516585428448-195a6245033c?auto=format&fit=crop&q=80&w=800" alt="Emergency" class="category-card-img"/>
       <div class="category-card-body">
         <span class="category-card-icon">🚨</span>
         <div class="category-card-title">Emergency Helpline</div>
@@ -158,7 +159,7 @@
 
     <!-- Household Workers -->
     <a href="household.html" class="category-card green reveal" data-ocid="categories.household.card">
-      <img src="/assets/generated/category-household.dim_600x400.jpg" alt="Household Workers" class="category-card-img"/>
+      <img src="https://images.unsplash.com/photo-1581578731548-c64695ce6958?auto=format&fit=crop&q=80&w=800" alt="Household Workers" class="category-card-img"/>
       <div class="category-card-body">
         <span class="category-card-icon">🏠</span>
         <div class="category-card-title">Household Workers</div>
@@ -336,7 +337,7 @@
   <div class="footer-grid">
     <div class="footer-brand">
       <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
-        <img src="/assets/generated/helpmatrix-logo-transparent.dim_400x150.png" alt="HelpMatrix" style="height:36px;"/>
+        <img src="assets/generated/logo.svg" alt="HelpMatrix" style="height:36px;"/>
         <span style="font-family:'Orbitron',monospace;font-weight:900;background:linear-gradient(135deg,#3b82f6,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">HelpMatrix</span>
       </div>
       <p>India's #1 emergency help platform. Connecting people in need with trusted providers — fast, free, and dignified.</p>
@@ -388,36 +389,6 @@
 <button class="back-to-top" id="backToTop" aria-label="Back to top" data-ocid="page.back_to_top.button">↑</button>
 <div id="toast" class="toast" data-ocid="page.toast"></div>
 
-<!-- CHECKOUT MODAL -->
-<div id="checkout-modal" class="modal-overlay">
-  <div class="modal-card">
-    <div class="modal-header">
-      <h3 class="modal-title">Request Item</h3>
-      <button class="modal-close" style="background:none;border:none;font-size:1.5rem;color:var(--text-muted);cursor:pointer;">&times;</button>
-    </div>
-    <form id="checkout-form">
-      <p style="color:var(--text-muted);margin-bottom:1.5rem;font-size:0.9rem;">
-        You are requesting: <strong id="checkout-item-name" style="color:var(--accent-blue);">Item Name</strong>
-      </p>
-      <div class="form-group">
-        <label class="form-label">Delivery / Pickup Address</label>
-        <textarea id="checkout-address" class="form-input" rows="2" placeholder="Enter your full address..." required></textarea>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Urgency</label>
-        <select id="checkout-urgency" class="form-select">
-          <option value="Normal">Normal (2-3 Days)</option>
-          <option value="High">High (Within 24 Hours)</option>
-          <option value="Critical">Critical (Immediate)</option>
-        </select>
-      </div>
-      <div style="display:flex;gap:1rem;margin-top:2rem;">
-        <button type="button" class="btn-secondary" style="flex:1;">Cancel</button>
-        <button type="submit" class="submit-btn" style="flex:1;margin-top:0;">Confirm Request</button>
-      </div>
-    </form>
-  </div>
-</div>
 <script src="main.js"></script>
 <script>
   // Contact form
@@ -429,4 +400,3 @@
 </script>
 </body>
 </html>
- 
