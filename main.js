@@ -2,6 +2,9 @@
 // HELPMATRIX - Main JavaScript
 // =============================================
 
+// ---- API CONFIG ----
+const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
+
 // ---- PARTICLES CANVAS ----
 function initParticles() {
   const canvas = document.getElementById('particles-canvas');
@@ -320,24 +323,32 @@ function initLoginPage() {
         return;
       }
 
-      const users = JSON.parse(localStorage.getItem('helpmatrix_users') || '[]');
-      const user = users.find(u => u.mobile === mobile && u.password === password && u.role === currentRole);
-
-      if (!user) {
-        showToast('Invalid credentials or role mismatch!', 'error');
-        return;
-      }
-
       const btn = loginForm.querySelector('.submit-btn');
       btn.textContent = 'Authenticating...';
       btn.disabled = true;
 
-      localStorage.setItem('helpmatrix_user', JSON.stringify({ name: user.name, role: user.role, mobile: user.mobile }));
-
-      setTimeout(() => {
+    fetch(`${API_BASE}/api/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile, password, role: currentRole })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) {
+          showToast(data.error || 'Login failed', 'error');
+          btn.textContent = 'Login';
+          btn.disabled = false;
+          return;
+        }
+        localStorage.setItem('helpmatrix_user', JSON.stringify(data.user));
         showToast('Login successful! Welcome back.');
-        setTimeout(() => { window.location.href = 'index.html'; }, 800);
-      }, 1200);
+        setTimeout(() => { window.location.href = currentRole === 'provider' ? 'dashboard.html' : 'index.html'; }, 800);
+      })
+      .catch(err => {
+        showToast('Network error', 'error');
+        btn.textContent = 'Login';
+        btn.disabled = false;
+      });
     });
   }
 
@@ -354,6 +365,8 @@ function initLoginPage() {
       const mobile = mobileInput ? mobileInput.value.trim() : '';
       const address = addressInput ? addressInput.value.trim() : '';
       const password = passwordInput ? passwordInput.value : '';
+      const category = document.getElementById('reg-category')?.value || '';
+      const org = document.getElementById('reg-org')?.value || '';
 
       if (mobile.length < 10) {
         showToast('Please enter a valid mobile number (min 10 digits).', 'error');
@@ -364,25 +377,32 @@ function initLoginPage() {
         return;
       }
 
-      const users = JSON.parse(localStorage.getItem('helpmatrix_users') || '[]');
-      if (users.find(u => u.mobile === mobile && u.role === currentRole)) {
-        showToast('User already exists in this role. Please login.', 'error');
-        return;
-      }
-
       const btn = registerForm.querySelector('.submit-btn');
       btn.textContent = 'Creating Account...';
       btn.disabled = true;
 
-      const newUser = { name, mobile, address, password, role: currentRole };
-      users.push(newUser);
-      localStorage.setItem('helpmatrix_users', JSON.stringify(users));
-      localStorage.setItem('helpmatrix_user', JSON.stringify({ name, role: currentRole, mobile }));
-
-      setTimeout(() => {
+      fetch(`${API_BASE}/api/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, mobile, address, password, role: currentRole, category, org })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) {
+          showToast(data.error || 'Registration failed', 'error');
+          btn.textContent = 'Create Account';
+          btn.disabled = false;
+          return;
+        }
+        localStorage.setItem('helpmatrix_user', JSON.stringify({ name, role: currentRole, mobile }));
         showToast('Account created! Welcome to HelpMatrix');
-        setTimeout(() => { window.location.href = 'index.html'; }, 800);
-      }, 1400);
+        setTimeout(() => { window.location.href = currentRole === 'provider' ? 'dashboard.html' : 'index.html'; }, 800);
+      })
+      .catch(err => {
+        showToast('Network error', 'error');
+        btn.textContent = 'Create Account';
+        btn.disabled = false;
+      });
     });
   }
 
@@ -468,11 +488,16 @@ function initProductActions() {
 }
 
 function submitMockOrder(itemName, address, urgency = 'Normal') {
-  const orders = JSON.parse(localStorage.getItem('helpmatrix_orders') || '[]');
-  
+  const userStr = localStorage.getItem('helpmatrix_user');
+  let userMobile = 'Unknown';
+  if (userStr) {
+    try { userMobile = JSON.parse(userStr).mobile || 'Unknown'; } catch(e){}
+  }
+
   const orderId = 'HM-' + Math.floor(100000 + Math.random() * 900000);
   const newOrder = {
     id: orderId,
+    userMobile: userMobile,
     item: itemName,
     address: address,
     urgency: urgency,
@@ -480,11 +505,20 @@ function submitMockOrder(itemName, address, urgency = 'Normal') {
     date: new Date().toLocaleDateString()
   };
   
-  orders.push(newOrder);
-  localStorage.setItem('helpmatrix_orders', JSON.stringify(orders));
-  sessionStorage.setItem('helpmatrix_last_order', JSON.stringify(newOrder));
-  
-  window.location.href = 'confirmation.html';
+  fetch(`${API_BASE}/api/orders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(newOrder)
+  })
+  .then(res => res.json())
+  .then(data => {
+    sessionStorage.setItem('helpmatrix_last_order', JSON.stringify(newOrder));
+    window.location.href = 'confirmation.html';
+  })
+  .catch(err => {
+    showToast('Failed to submit order to database', 'error');
+    console.error(err);
+  });
 }
 
 // ---- INIT ----
@@ -501,11 +535,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setTimeout(() => {
     if (typeof THREE !== 'undefined') initThreeHero();
-    else {
-      const s = document.createElement('script');
-      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
-      s.onload = initThreeHero;
-      document.head.appendChild(s);
-    }
   }, 500);
 });
