@@ -2,6 +2,18 @@ const ADODB = require('node-adodb');
 const connection = ADODB.open('Provider=Microsoft.ACE.OLEDB.12.0;Data Source=HelpMatrix.accdb;Persist Security Info=False;');
 
 async function setup() {
+  console.log("Starting Database Setup...");
+  
+  const tables = ['Users', 'Orders', 'Products'];
+  for (const table of tables) {
+    try {
+      await connection.execute(`DROP TABLE [${table}]`);
+      console.log(`Existing table ${table} dropped.`);
+    } catch (e) {
+      // Ignore if table doesn't exist
+    }
+  }
+
   try {
     await connection.execute(`
       CREATE TABLE Users (
@@ -32,7 +44,7 @@ async function setup() {
     `);
     console.log("Orders table created");
 
-    // Products table
+    // Expanded Products table
     await connection.execute(`
       CREATE TABLE Products (
         ProductID VARCHAR(50) PRIMARY KEY,
@@ -40,25 +52,17 @@ async function setup() {
         ItemName VARCHAR(255),
         Category VARCHAR(100),
         Price VARCHAR(50),
-        [Status] VARCHAR(50)
+        [Status] VARCHAR(50),
+        [Meta] MEMO,
+        [Tags] MEMO,
+        [Image] MEMO,
+        [Badge] VARCHAR(100),
+        [IsUrgent] BIT
       )
     `);
     console.log("Products table created");
 
-    // Seed Mock Data for Provider 9999999999
-    const mockOrders = [
-      ['HM-1001', '0987654321', 'Cotton Saree Set', '456 Mumbai St', 'Normal', 'Pending', '4/8/2026', '650', '9999999999'],
-      ['HM-1002', '1234567890', 'Winter Jacket', '789 Delhi Ave', 'High', 'Pending', '4/8/2026', '899', '9999999999'],
-      ['HM-1003', '5555555555', 'Linen Kurta', '101 Pune Rd', 'Normal', 'Pending', '4/8/2026', '1200', '9999999999']
-    ];
-
-    for (const mo of mockOrders) {
-      await connection.execute(`
-        INSERT INTO Orders (OrderID, UserMobile, Item, Address, Urgency, Status, OrderDate, Price, ProviderMobile) 
-        VALUES ('${mo[0]}', '${mo[1]}', '${mo[2]}', '${mo[3]}', '${mo[4]}', '${mo[5]}', '${mo[6]}', '${mo[7]}', '${mo[8]}')
-      `);
-    }
-    console.log("Mock orders seeded");
+    console.log("Database setup completed successfully (Empty tables).");
   } catch (error) {
     console.error("Error setting up tables:", error);
   }

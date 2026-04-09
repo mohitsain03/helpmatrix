@@ -1,165 +1,182 @@
 const express = require('express');
 const cors = require('cors');
-const fs = require('fs');
 const path = require('path');
+const ADODB = require('node-adodb');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-// Serve static files from the current directory
 app.use(express.static('.'));
 
-const DATA_DIR = path.join(__dirname, 'data');
+const DB_PATH = path.join(__dirname, 'HelpMatrix.accdb');
+const connection = ADODB.open(`Provider=Microsoft.ACE.OLEDB.12.0;Data Source=${DB_PATH};Persist Security Info=False;`);
 
-// Helper functions for JSON database
-function readData(file) {
-  const filePath = path.join(DATA_DIR, file);
-  if (!fs.existsSync(filePath)) return [];
+// Helper for SQL execution to handle errors consistently
+async function query(sql) {
   try {
-    const content = fs.readFileSync(filePath, 'utf8');
-    return JSON.parse(content || '[]');
+    return await connection.query(sql);
   } catch (err) {
-    console.error(`Error reading ${file}:`, err);
-    return [];
+    console.error('Database Query Error:', err.process ? err.process.message : err.message);
+    throw err;
   }
 }
 
-function writeData(file, data) {
-  const filePath = path.join(DATA_DIR, file);
+async function execute(sql) {
   try {
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
-    return true;
+    return await connection.execute(sql);
   } catch (err) {
-    console.error(`Error writing ${file}:`, err);
-    return false;
+    console.error('Database Execution Error:', err.process ? err.process.message : err.message);
+    throw err;
   }
 }
 
 // GET Category Items API
-app.get('/api/items/:category', (req, res) => {
-  const { category } = req.params;
-  const items = readData(`${category.toLowerCase()}.json`);
-  res.json({ success: true, items });
+app.get('/api/items/:category', async (req, res) => {
+  try {
+    const { category } = req.params;
+    // Simple mapping for category name to match what we stored
+    const cat = category.toLowerCase().replace(/ /g, '-');
+    const rows = await query(`SELECT * FROM Products WHERE Category = '${cat}' OR Category = '${category}'`);
+    
+    // Map Access rows back to the frontend expected format
+    const items = rows.map(r => ({
+      id: r.ProductID,
+      name: r.ItemName,
+      meta: r.Meta || "",
+      tags: (r.Tags || "").split(',').filter(t => t),
+      price: r.Price,
+      image: r.Image,
+      badge: r.Badge,
+      isUrgent: r.IsUrgent === true || r.IsUrgent === -1 // Access BIT is -1 for True
+    }));
+    
+    res.json({ success: true, items });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Failed to fetch items' });
+  }
 });
 
 // REGISTER API
-app.post('/api/register', (req, res) => {
-  const { name, mobile, address, password, role, category, org } = req.body;
-  const users = readData('users.json');
-  
-  if (users.find(u => u.Mobile === mobile && u.Role === role)) {
-    return res.status(400).json({ error: 'User already exists in this role. Please login.' });
+app.post('/api/register', async (req, res) => {
+  try {
+    const { name, mobile, address, password, role, category, org } = req.body;
+    
+    const existing = await query(`SELECT * FROM Users WHERE Mobile = '${mobile}' AND Role = '${role}'`);
+    if (existing.length > 0) {
+      return res.status(400).json({ error: 'User already exists in this role. Please login.' });
+    }
+
+    await execute(`
+      INSERT INTO Users (FullName, Mobile, Address, [Password], Role, Category, Org)
+      VALUES ('${name}', '${mobile}', '${address.replace(/'/g, "''")}', '${password}', '${role}', '${category || ""}', '${org || ""}')
+    `);
+    
+    res.json({ success: true, message: 'Account created successfully' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Registration failed' });
   }
-
-  const newUser = {
-    FullName: name,
-    Mobile: mobile,
-    Address: address,
-    Password: password,
-    Role: role,
-    Category: category || "",
-    Org: org || ""
-  };
-
-  users.push(newUser);
-  writeData('users.json', users);
-  
-  res.json({ success: true, message: 'Account created successfully' });
 });
 
 // LOGIN API
-app.post('/api/login', (req, res) => {
-  const { mobile, password, role } = req.body;
-  const users = readData('users.json');
-  
-  const user = users.find(u => u.Mobile === mobile && u.Password === password && u.Role === role);
-  
-  if (!user) {
-    return res.status(401).json({ error: 'Invalid credentials or role mismatch!' });
+app.post('/api/login', async (req, res) => {
+  try {
+    const { mobile, password, role } = req.body;
+    const users = await query(`SELECT * FROM Users WHERE Mobile = '${mobile}' AND [Password] = '${password}' AND Role = '${role}'`);
+    
+    if (users.length === 0) {
+      return res.status(401).json({ error: 'Invalid credentials or role mismatch!' });
+    }
+    
+    const user = users[0];
+    res.json({ success: true, user: { name: user.FullName, mobile: user.Mobile, role: user.Role } });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Login failed' });
   }
-  
-  res.json({ success: true, user: { name: user.FullName, mobile: user.Mobile, role: user.Role } });
 });
 
-// ORDERS API (Submit from Consumer)
-app.post('/api/orders', (req, res) => {
-  const { id, userMobile, item, address, urgency, status, date, price, providerMobile } = req.body;
-  const orders = readData('orders.json');
-  
-  const newOrder = {
-    OrderID: id,
-    UserMobile: userMobile,
-    Item: item,
-    Address: address,
-    Urgency: urgency,
-    Status: status,
-    OrderDate: date,
-    Price: price || "0",
-    ProviderMobile: providerMobile || "Not Assigned"
-  };
-
-  orders.push(newOrder);
-  writeData('orders.json', orders);
-  res.json({ success: true });
+// ORDERS API (Submit)
+app.post('/api/orders', async (req, res) => {
+  try {
+    const { id, userMobile, item, address, urgency, status, date, price, providerMobile } = req.body;
+    
+    await execute(`
+      INSERT INTO Orders (OrderID, UserMobile, Item, Address, Urgency, Status, OrderDate, Price, ProviderMobile)
+      VALUES ('${id}', '${userMobile}', '${item.replace(/'/g, "''")}', '${address.replace(/'/g, "''")}', '${urgency}', '${status}', '${date}', '${price || "0"}', '${providerMobile || "Not Assigned"}')
+    `);
+    
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Order submission failed' });
+  }
 });
 
 // GET ORDERS (Consumer)
-app.get('/api/orders/:mobile', (req, res) => {
-  const { mobile } = req.params;
-  const orders = readData('orders.json');
-  const userOrders = orders.filter(o => o.UserMobile === mobile);
-  res.json({ success: true, orders: userOrders });
+app.get('/api/orders/:mobile', async (req, res) => {
+  try {
+    const { mobile } = req.params;
+    const rows = await query(`SELECT * FROM Orders WHERE UserMobile = '${mobile}'`);
+    res.json({ success: true, orders: rows });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Failed to fetch orders' });
+  }
 });
 
-// Orders for a Provider (Incoming requests)
-app.get('/api/provider/orders/:mobile', (req, res) => {
-  const { mobile } = req.params;
-  const orders = readData('orders.json');
-  let providerOrders = orders.filter(o => o.ProviderMobile === mobile);
-  
-  // Auto-seed mock data for every provider if they have no orders
-  if (providerOrders.length === 0) {
-    const mockOrders = [
-      { OrderID: 'HM-D' + Math.floor(1000+Math.random()*9000), UserMobile: '0987654321', Item: 'Premium Saree Set', Address: '456 MG Road, Mumbai', Urgency: 'Normal', Status: 'Pending', OrderDate: '4/8/2026', Price: '1250', ProviderMobile: mobile },
-      { OrderID: 'HM-D' + Math.floor(1000+Math.random()*9000), UserMobile: '1234567890', Item: 'Leather Jacket', Address: '789 Connaught Place, Delhi', Urgency: 'High', Status: 'Pending', OrderDate: '4/8/2026', Price: '2499', ProviderMobile: mobile },
-      { OrderID: 'HM-D' + Math.floor(1000+Math.random()*9000), UserMobile: '5555555555', Item: 'Handmade Vase', Address: '101 FC Road, Pune', Urgency: 'Normal', Status: 'Pending', OrderDate: '4/8/2026', Price: '450', ProviderMobile: mobile }
-    ];
-    orders.push(...mockOrders);
-    writeData('orders.json', orders);
-    providerOrders = mockOrders;
+// Orders for a Provider
+app.get('/api/provider/orders/:mobile', async (req, res) => {
+  try {
+    const { mobile } = req.params;
+    let rows = await query(`SELECT * FROM Orders WHERE ProviderMobile = '${mobile}'`);
+    
+    if (rows.length === 0) {
+      // Auto-seed mock data as before, but directly into Access
+      const mockOrders = [
+        ['HM-D' + Math.floor(1000+Math.random()*9000), '0987654321', 'Premium Saree Set', '456 MG Road, Mumbai', 'Normal', 'Pending', '4/8/2026', '1250', mobile],
+        ['HM-D' + Math.floor(1000+Math.random()*9000), '1234567890', 'Leather Jacket', '789 Connaught Place, Delhi', 'High', 'Pending', '4/8/2026', '2499', mobile],
+        ['HM-D' + Math.floor(1000+Math.random()*9000), '5555555555', 'Handmade Vase', '101 FC Road, Pune', 'Normal', 'Pending', '4/8/2026', '450', mobile]
+      ];
+      
+      for (const mo of mockOrders) {
+        await execute(`
+          INSERT INTO Orders (OrderID, UserMobile, Item, Address, Urgency, Status, OrderDate, Price, ProviderMobile)
+          VALUES ('${mo[0]}', '${mo[1]}', '${mo[2]}', '${mo[3]}', '${mo[4]}', '${mo[5]}', '${mo[6]}', '${mo[7]}', '${mo[8]}')
+        `);
+      }
+      rows = await query(`SELECT * FROM Orders WHERE ProviderMobile = '${mobile}'`);
+    }
+    
+    res.json({ success: true, orders: rows });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Failed to fetch provider orders' });
   }
-
-  res.json({ success: true, orders: providerOrders });
 });
 
 // Products for a Provider
-app.get('/api/provider/products/:mobile', (req, res) => {
-  const { mobile } = req.params;
-  const products = readData('provider_pending_products.json');
-  const providerProducts = products.filter(p => p.ProviderMobile === mobile);
-  res.json({ success: true, products: providerProducts });
+app.get('/api/provider/products/:mobile', async (req, res) => {
+  try {
+    const { mobile } = req.params;
+    const rows = await query(`SELECT * FROM Products WHERE ProviderMobile = '${mobile}'`);
+    res.json({ success: true, products: rows });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Failed to fetch provider products' });
+  }
 });
 
 // Add Product (Provider)
-app.post('/api/provider/products', (req, res) => {
-  const { id, mobile, name, category, price, status } = req.body;
-  const products = readData('provider_pending_products.json');
-  
-  const newProduct = {
-    ProductID: id,
-    ProviderMobile: mobile,
-    ItemName: name,
-    Category: category,
-    Price: price,
-    Status: status || "Pending"
-  };
-
-  products.push(newProduct);
-  writeData('provider_pending_products.json', products);
-  res.json({ success: true });
+app.post('/api/provider/products', async (req, res) => {
+  try {
+    const { id, mobile, name, category, price, status } = req.body;
+    
+    await execute(`
+      INSERT INTO Products (ProductID, ProviderMobile, ItemName, Category, Price, [Status])
+      VALUES ('${id}', '${mobile}', '${name.replace(/'/g, "''")}', '${category}', '${price}', '${status || "Pending"}')
+    `);
+    
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Failed to add product' });
+  }
 });
 
 app.listen(3000, () => {
-  console.log('HelpMatrix Backend running on http://localhost:3000');
+  console.log('HelpMatrix Backend running on http://localhost:3000 (Microsoft Access Mode)');
 });
-
