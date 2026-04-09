@@ -92,7 +92,7 @@
           let ordersHtml = '';
           // Reverse array so latest is first
           [...orders].reverse().forEach(order => {
-            let statusColor = order.Status === 'Pending' ? '#eab308' : (order.Status === 'Processing' ? '#3b82f6' : '#22c55e');
+            let statusColor = order.Status === 'Pending' ? '#eab308' : (order.Status === 'Accepted' ? '#22c55e' : (order.Status === 'Processing' ? '#3b82f6' : '#22c55e'));
             // ADODB returns column names as they were defined (OrderID, Status, etc)
             let oid = order.OrderID || order.ID || order.id || 'N/A';
             let oitem = order.Item || order.item || 'Unknown Item';

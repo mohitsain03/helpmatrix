@@ -202,6 +202,24 @@ app.post('/api/provider/products', async (req, res) => {
   }
 });
 
+// Update Order Status
+app.patch('/api/orders/:orderId/status', async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { status } = req.body;
+    
+    await execute(`
+      UPDATE Orders 
+      SET [Status] = '${status}' 
+      WHERE OrderID = '${orderId}'
+    `);
+    
+    res.json({ success: true, message: `Order ${orderId} updated to ${status}` });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Failed to update order status' });
+  }
+});
+
 app.listen(3000, () => {
   console.log('HelpMatrix Backend running on http://localhost:3000 (Provider Approval Mode)');
 });
