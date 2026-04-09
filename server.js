@@ -121,11 +121,11 @@ app.post('/api/login', async (req, res) => {
 // ORDERS API (Submit)
 app.post('/api/orders', async (req, res) => {
   try {
-    const { id, userMobile, item, address, urgency, status, date, price, providerMobile } = req.body;
+    const { id, userMobile, item, address, urgency, status, category, date, price, providerMobile } = req.body;
     
     await execute(`
-      INSERT INTO Orders (OrderID, UserMobile, Item, Address, Urgency, Status, OrderDate, Price, ProviderMobile)
-      VALUES ('${id}', '${userMobile}', '${item.replace(/'/g, "''")}', '${address.replace(/'/g, "''")}', '${urgency}', '${status}', '${date}', '${price || "0"}', '${providerMobile || "Not Assigned"}')
+      INSERT INTO Orders (OrderID, UserMobile, Item, Address, Urgency, Status, Category, OrderDate, Price, ProviderMobile)
+      VALUES ('${id}', '${userMobile}', '${item.replace(/'/g, "''")}', '${address.replace(/'/g, "''")}', '${urgency}', '${status}', '${category || ""}', '${date}', '${price || "0"}', '${providerMobile || "Not Assigned"}')
     `);
     
     res.json({ success: true });
@@ -151,21 +151,19 @@ app.get('/api/provider/orders/:mobile', async (req, res) => {
     const { mobile } = req.params;
     let rows = await query(`SELECT * FROM Orders WHERE ProviderMobile = '${mobile}'`);
     
-    if (rows.length === 0) {
-      const mockOrders = [
-        ['HM-D' + Math.floor(1000+Math.random()*9000), '0987654321', 'Premium Saree Set', '456 MG Road, Mumbai', 'Normal', 'Pending', '4/8/2026', '1250', mobile],
-        ['HM-D' + Math.floor(1000+Math.random()*9000), '1234567890', 'Leather Jacket', '789 Connaught Place, Delhi', 'High', 'Pending', '4/8/2026', '2499', mobile]
-      ];
-      
-      for (const mo of mockOrders) {
-        await execute(`
-          INSERT INTO Orders (OrderID, UserMobile, Item, Address, Urgency, Status, OrderDate, Price, ProviderMobile)
-          VALUES ('${mo[0]}', '${mo[1]}', '${mo[2]}', '${mo[3]}', '${mo[4]}', '${mo[5]}', '${mo[6]}', '${mo[7]}', '${mo[8]}')
-        `);
-      }
-      rows = await query(`SELECT * FROM Orders WHERE ProviderMobile = '${mobile}'`);
+    // 1. Get Provider info to know their category
+    const providers = await query(`SELECT Category FROM Users WHERE Mobile = '${mobile}' AND Role = 'provider'`);
+    if (providers.length > 0) {
+      const providerCategory = providers[0].Category;
+      // 2. Fetch orders: Specifically assigned OR unassigned matching category
+      rows = await query(`
+        SELECT * FROM Orders 
+        WHERE ProviderMobile = '${mobile}' 
+        OR (ProviderMobile = 'Not Assigned' AND (Category = '${providerCategory}' OR Category = 'General'))
+        ORDER BY OrderDate DESC
+      `);
     }
-    
+
     res.json({ success: true, orders: rows });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Failed to fetch provider orders' });
@@ -206,13 +204,21 @@ app.post('/api/provider/products', async (req, res) => {
 app.patch('/api/orders/:orderId/status', async (req, res) => {
   try {
     const { orderId } = req.params;
-    const { status } = req.body;
+    const { status, providerMobile } = req.body;
     
-    await execute(`
-      UPDATE Orders 
-      SET [Status] = '${status}' 
-      WHERE OrderID = '${orderId}'
-    `);
+    if (providerMobile) {
+      await execute(`
+        UPDATE Orders 
+        SET [Status] = '${status}', ProviderMobile = '${providerMobile}'
+        WHERE OrderID = '${orderId}'
+      `);
+    } else {
+      await execute(`
+        UPDATE Orders 
+        SET [Status] = '${status}' 
+        WHERE OrderID = '${orderId}'
+      `);
+    }
     
     res.json({ success: true, message: `Order ${orderId} updated to ${status}` });
   } catch (err) {

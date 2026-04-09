@@ -426,6 +426,7 @@ function initLoginPage() {
 let currentRequestItemName = '';
 let currentRequestItemPrice = '0';
 let currentRequestItemProvider = '';
+let currentRequestItemCategory = '';
 // ---- DYNAMIC PRODUCT LOADING ----
 async function loadCategoryItems() {
   const container = document.querySelector('[data-ocid="products.list"]');
@@ -519,11 +520,15 @@ function initProductActions() {
         const card = btn.closest('.product-card') || btn.closest('.category-hero-content');
         currentRequestItemName = card ? (card.querySelector('.product-name')?.textContent || card.querySelector('.category-hero-title')?.textContent || 'Emergency Request') : 'Requested Service';
         
-        // Extract price and provider
+        // Extract price, provider and category
         const priceEl = card ? card.querySelector('.product-price') : null;
         const priceText = priceEl ? priceEl.textContent.replace('FREE', '0').replace('₹', '').replace(',', '').trim() : '0';
         currentRequestItemPrice = priceText;
         currentRequestItemProvider = card ? (card.getAttribute('data-provider') || 'Not Assigned') : 'Not Assigned';
+
+        // Detect Category from Page Title
+        const pageTitle = document.title.split('-')[1]?.trim() || 'General';
+        currentRequestItemCategory = pageTitle;
 
         if (modal) {
           document.getElementById('checkout-item-name').textContent = currentRequestItemName;
@@ -563,13 +568,13 @@ function initProductActions() {
         submitBtn.textContent = 'Processing...';
         submitBtn.disabled = true;
 
-        setTimeout(() => submitMockOrder(currentRequestItemName, address, urgency, currentRequestItemPrice, currentRequestItemProvider), 1200);
+        setTimeout(() => submitMockOrder(currentRequestItemName, address, urgency, currentRequestItemPrice, currentRequestItemProvider, currentRequestItemCategory), 1200);
       });
     }
   }
 }
 
-function submitMockOrder(itemName, address, urgency = 'Normal', price = '0', provider = '') {
+function submitMockOrder(itemName, address, urgency = 'Normal', price = '0', provider = '', category = 'General') {
   const userStr = localStorage.getItem('helpmatrix_user');
   let userMobile = 'Unknown';
   if (userStr) {
@@ -584,6 +589,7 @@ function submitMockOrder(itemName, address, urgency = 'Normal', price = '0', pro
     address: address,
     urgency: urgency,
     status: 'Pending',
+    category: category,
     date: new Date().toLocaleDateString(),
     price: price,
     providerMobile: provider
