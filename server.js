@@ -150,11 +150,10 @@ app.get('/api/provider/orders/:mobile', async (req, res) => {
   try {
     const { mobile } = req.params;
     
-    // Fetch orders: Specifically assigned to this provider OR unassigned 'Pending' orders
+    // Fetch orders: Any 'Pending' order in the system should appear for approval
     const rows = await query(`
       SELECT * FROM Orders 
-      WHERE (ProviderMobile = '${mobile}' OR ProviderMobile = 'Not Assigned')
-      AND Status = 'Pending'
+      WHERE Status = 'Pending' OR ProviderMobile = '${mobile}'
       ORDER BY OrderDate DESC
     `);
 
