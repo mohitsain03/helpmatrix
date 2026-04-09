@@ -158,8 +158,8 @@ app.get('/api/provider/orders/:mobile', async (req, res) => {
       // 2. Fetch orders: Specifically assigned OR unassigned matching category
       rows = await query(`
         SELECT * FROM Orders 
-        WHERE ProviderMobile = '${mobile}' 
-        OR (ProviderMobile = 'Not Assigned' AND (Category = '${providerCategory}' OR Category = 'General'))
+        WHERE (ProviderMobile = '${mobile}' OR (ProviderMobile = 'Not Assigned' AND (Category = '${providerCategory}' OR Category = 'General')))
+        AND Status = 'Pending'
         ORDER BY OrderDate DESC
       `);
     }
@@ -190,11 +190,11 @@ app.post('/api/provider/products', async (req, res) => {
     const { id, mobile, name, category, price, status } = req.body;
     
     await execute(`
-      INSERT INTO PendingProducts (ProductID, ProviderMobile, ItemName, Category, Price, [Status], [Badge])
-      VALUES ('${id}', '${mobile}', '${name.replace(/'/g, "''")}', '${category}', '${price}', 'Pending', 'Awaiting Approval')
+      INSERT INTO ProviderProducts (ProductID, ProviderMobile, ItemName, Category, Price, [Status], [Badge])
+      VALUES ('${id}', '${mobile}', '${name.replace(/'/g, "''")}', '${category}', '${price}', 'Active', 'In Stock')
     `);
     
-    res.json({ success: true, message: 'Product submitted for approval' });
+    res.json({ success: true, message: 'Product listed successfully' });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Failed to submit product' });
   }

@@ -128,7 +128,7 @@
       .then(res => res.json())
       .then(data => {
         const orders = data.success ? data.orders : [];
-        document.getElementById('stat-orders').textContent = orders.filter(o => o.Status === 'Pending').length;
+        document.getElementById('stat-orders').textContent = orders.length;
         document.getElementById('orders-count').textContent = `(${orders.length})`;
         
         let earn = 0;
@@ -156,23 +156,20 @@
         }
       });
 
-    // 2. Load My Products (Active and Pending)
+    // 2. Load My Products (Active only)
     fetch(`${API_BASE}/api/provider/products/` + mobile)
       .then(res => res.json())
       .then(data => {
         const active = data.success ? data.active : [];
-        const pending = data.success ? data.pending : [];
         
         document.getElementById('stat-products').textContent = active.length;
-        document.getElementById('products-count').textContent = `(${active.length + pending.length})`;
+        document.getElementById('products-count').textContent = `(${active.length})`;
 
         const container = document.getElementById('products-container');
         
         let html = '';
         
-        // Active Section
         if (active.length > 0) {
-          html += '<h3 style="margin: 1.5rem 0 0.5rem; font-size: 0.9rem; color: var(--accent-green);">Live Listings</h3>';
           html += active.map(p => `
             <div class="dash-card">
               <div>
@@ -185,25 +182,9 @@
             </div>
           `).join('');
         }
-        
-        // Pending Section
-        if (pending.length > 0) {
-          html += '<h3 style="margin: 1.5rem 0 0.5rem; font-size: 0.9rem; color: var(--accent-yellow);">Pending Approvals</h3>';
-          html += pending.map(p => `
-            <div class="dash-card" style="opacity: 0.8; border-style: dashed;">
-              <div>
-                <h4 style="margin:0;">${p.ItemName}</h4>
-                <p>Category: ${p.Category} • Requested Price: ₹${p.Price}</p>
-              </div>
-              <div style="text-align:right;">
-                <span class="status" style="background:rgba(234,179,8,0.1);color:#eab308;">Pending</span>
-              </div>
-            </div>
-          `).join('');
-        }
 
-        if (active.length === 0 && pending.length === 0) {
-          container.innerHTML = '<div class="dash-card" style="justify-content:center;color:var(--text-muted);">No products listed or pending yet.</div>';
+        if (active.length === 0) {
+          container.innerHTML = '<div class="dash-card" style="justify-content:center;color:var(--text-muted);">No products listed yet.</div>';
         } else {
           container.innerHTML = html;
         }
