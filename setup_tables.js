@@ -4,7 +4,7 @@ const connection = ADODB.open('Provider=Microsoft.ACE.OLEDB.12.0;Data Source=Hel
 async function setup() {
   console.log("Starting Database Setup...");
   
-  const tables = ['Users', 'Orders', 'Products'];
+  const tables = ['Users', 'Orders', 'Aadhaar', 'BloodBank', 'Clothing', 'Electronics', 'Emergency', 'Household'];
   for (const table of tables) {
     try {
       await connection.execute(`DROP TABLE [${table}]`);
@@ -44,23 +44,24 @@ async function setup() {
     `);
     console.log("Orders table created");
 
-    // Expanded Products table
-    await connection.execute(`
-      CREATE TABLE Products (
-        ProductID VARCHAR(50) PRIMARY KEY,
-        ProviderMobile VARCHAR(50),
-        ItemName VARCHAR(255),
-        Category VARCHAR(100),
-        Price VARCHAR(50),
-        [Status] VARCHAR(50),
-        [Meta] MEMO,
-        [Tags] MEMO,
-        [Image] MEMO,
-        [Badge] VARCHAR(100),
-        [IsUrgent] BIT
-      )
-    `);
-    console.log("Products table created");
+    const categoryTables = ['Aadhaar', 'BloodBank', 'Clothing', 'Electronics', 'Emergency', 'Household'];
+    for(const table of categoryTables) {
+        await connection.execute(`
+          CREATE TABLE [${table}] (
+            ProductID VARCHAR(50) PRIMARY KEY,
+            ProviderMobile VARCHAR(50),
+            ItemName VARCHAR(255),
+            Price VARCHAR(50),
+            [Status] VARCHAR(50),
+            [Meta] MEMO,
+            [Tags] MEMO,
+            [Image] MEMO,
+            [Badge] VARCHAR(100),
+            [IsUrgent] BIT
+          )
+        `);
+        console.log(`${table} table created`);
+    }
 
     console.log("Database setup completed successfully (Empty tables).");
   } catch (error) {

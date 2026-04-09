@@ -11,7 +11,7 @@ app.use(express.static('.'));
 const DB_PATH = path.join(__dirname, 'HelpMatrix.accdb');
 const connection = ADODB.open(`Provider=Microsoft.ACE.OLEDB.12.0;Data Source=${DB_PATH};Persist Security Info=False;`);
 
-// Helper for SQL execution to handle errors consistently
+// Helper for SQL execution
 async function query(sql) {
   try {
     return await connection.query(sql);
@@ -30,15 +30,32 @@ async function execute(sql) {
   }
 }
 
+// Category Mapping helper
+function getTableName(category) {
+  const map = {
+    'electronics': 'Electronics',
+    'clothing': 'Clothing',
+    'household': 'Household',
+    'household workers': 'Household',
+    'aadhaar': 'Aadhaar',
+    'aadhaar services': 'Aadhaar',
+    'blood-bank': 'BloodBank',
+    'blood bank': 'BloodBank',
+    'emergency': 'Emergency',
+    'emergency helpline': 'Emergency'
+  };
+  return map[category.toLowerCase()] || 'Household';
+}
+
 // GET Category Items API
 app.get('/api/items/:category', async (req, res) => {
   try {
     const { category } = req.params;
-    // Simple mapping for category name to match what we stored
-    const cat = category.toLowerCase().replace(/ /g, '-');
-    const rows = await query(`SELECT * FROM Products WHERE Category = '${cat}' OR Category = '${category}'`);
+    const tableName = getTableName(category);
     
-    // Map Access rows back to the frontend expected format
+    // Query the specific category table
+    const rows = await query(`SELECT * FROM [${tableName}]`);
+    
     const items = rows.map(r => ({
       id: r.ProductID,
       name: r.ItemName,
@@ -47,7 +64,7 @@ app.get('/api/items/:category', async (req, res) => {
       price: r.Price,
       image: r.Image,
       badge: r.Badge,
-      isUrgent: r.IsUrgent === true || r.IsUrgent === -1 // Access BIT is -1 for True
+      isUrgent: r.IsUrgent === true || r.IsUrgent === -1
     }));
     
     res.json({ success: true, items });
@@ -128,11 +145,9 @@ app.get('/api/provider/orders/:mobile', async (req, res) => {
     let rows = await query(`SELECT * FROM Orders WHERE ProviderMobile = '${mobile}'`);
     
     if (rows.length === 0) {
-      // Auto-seed mock data as before, but directly into Access
       const mockOrders = [
         ['HM-D' + Math.floor(1000+Math.random()*9000), '0987654321', 'Premium Saree Set', '456 MG Road, Mumbai', 'Normal', 'Pending', '4/8/2026', '1250', mobile],
-        ['HM-D' + Math.floor(1000+Math.random()*9000), '1234567890', 'Leather Jacket', '789 Connaught Place, Delhi', 'High', 'Pending', '4/8/2026', '2499', mobile],
-        ['HM-D' + Math.floor(1000+Math.random()*9000), '5555555555', 'Handmade Vase', '101 FC Road, Pune', 'Normal', 'Pending', '4/8/2026', '450', mobile]
+        ['HM-D' + Math.floor(1000+Math.random()*9000), '1234567890', 'Leather Jacket', '789 Connaught Place, Delhi', 'High', 'Pending', '4/8/2026', '2499', mobile]
       ];
       
       for (const mo of mockOrders) {
@@ -154,8 +169,19 @@ app.get('/api/provider/orders/:mobile', async (req, res) => {
 app.get('/api/provider/products/:mobile', async (req, res) => {
   try {
     const { mobile } = req.params;
-    const rows = await query(`SELECT * FROM Products WHERE ProviderMobile = '${mobile}'`);
-    res.json({ success: true, products: rows });
+    
+    // Note: To find products by provider across all tables, we'd need to UNION or loop.
+    // For now, checking the Category associated with the user role might be more efficient,
+    // but here we'll just check the most common tables for the product list.
+    const tables = ['Electronics', 'Clothing', 'BloodBank', 'Aadhaar', 'Emergency', 'Household'];
+    let allProducts = [];
+    
+    for(const table of tables) {
+        const rows = await query(`SELECT * FROM [${table}] WHERE ProviderMobile = '${mobile}'`);
+        allProducts = allProducts.concat(rows);
+    }
+    
+    res.json({ success: true, products: allProducts });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Failed to fetch provider products' });
   }
@@ -165,10 +191,11 @@ app.get('/api/provider/products/:mobile', async (req, res) => {
 app.post('/api/provider/products', async (req, res) => {
   try {
     const { id, mobile, name, category, price, status } = req.body;
+    const tableName = getTableName(category);
     
     await execute(`
-      INSERT INTO Products (ProductID, ProviderMobile, ItemName, Category, Price, [Status])
-      VALUES ('${id}', '${mobile}', '${name.replace(/'/g, "''")}', '${category}', '${price}', '${status || "Pending"}')
+      INSERT INTO [${tableName}] (ProductID, ProviderMobile, ItemName, Price, [Status])
+      VALUES ('${id}', '${mobile}', '${name.replace(/'/g, "''")}', '${price}', '${status || "Pending"}')
     `);
     
     res.json({ success: true });
@@ -178,5 +205,5 @@ app.post('/api/provider/products', async (req, res) => {
 });
 
 app.listen(3000, () => {
-  console.log('HelpMatrix Backend running on http://localhost:3000 (Microsoft Access Mode)');
+  console.log('HelpMatrix Backend running on http://localhost:3000 (Multi-Table Access Mode)');
 });
