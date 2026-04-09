@@ -156,29 +156,56 @@
         }
       });
 
-    // 2. Load My Products
+    // 2. Load My Products (Active and Pending)
     fetch(`${API_BASE}/api/provider/products/` + mobile)
       .then(res => res.json())
       .then(data => {
-        const products = data.success ? data.products : [];
-        document.getElementById('stat-products').textContent = products.length;
-        document.getElementById('products-count').textContent = `(${products.length})`;
+        const active = data.success ? data.active : [];
+        const pending = data.success ? data.pending : [];
+        
+        document.getElementById('stat-products').textContent = active.length;
+        document.getElementById('products-count').textContent = `(${active.length + pending.length})`;
 
         const container = document.getElementById('products-container');
-        if (products.length === 0) {
-          container.innerHTML = '<div class="dash-card" style="justify-content:center;color:var(--text-muted);">No products listed yet.</div>';
-        } else {
-          container.innerHTML = products.map(p => `
+        
+        let html = '';
+        
+        // Active Section
+        if (active.length > 0) {
+          html += '<h3 style="margin: 1.5rem 0 0.5rem; font-size: 0.9rem; color: var(--accent-green);">Live Listings</h3>';
+          html += active.map(p => `
             <div class="dash-card">
               <div>
-                <h4 style="margin-0;">${p.ItemName}</h4>
+                <h4 style="margin:0;">${p.ItemName}</h4>
                 <p>Category: ${p.Category} • Listed Price: ₹${p.Price}</p>
               </div>
-              <div>
-                <span class="status" style="background:rgba(34,197,94,0.1);color:#22c55e;">${p.Status}</span>
+              <div style="text-align:right;">
+                <span class="status" style="background:rgba(34,197,94,0.1);color:#22c55e;">Active</span>
               </div>
             </div>
           `).join('');
+        }
+        
+        // Pending Section
+        if (pending.length > 0) {
+          html += '<h3 style="margin: 1.5rem 0 0.5rem; font-size: 0.9rem; color: var(--accent-yellow);">Pending Approvals</h3>';
+          html += pending.map(p => `
+            <div class="dash-card" style="opacity: 0.8; border-style: dashed;">
+              <div>
+                <h4 style="margin:0;">${p.ItemName}</h4>
+                <p>Category: ${p.Category} • Requested Price: ₹${p.Price}</p>
+              </div>
+              <div style="text-align:right;">
+                <span class="status" style="background:rgba(234,179,8,0.1);color:#eab308;">Pending</span>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        if (active.length === 0 && pending.length === 0) {
+          container.innerHTML = '<div class="dash-card" style="justify-content:center;color:var(--text-muted);">No products listed or pending yet.</div>';
+        } else {
+          container.innerHTML = html;
         }
       });
   });

@@ -4,7 +4,7 @@ const connection = ADODB.open('Provider=Microsoft.ACE.OLEDB.12.0;Data Source=Hel
 async function setup() {
   console.log("Starting Database Setup...");
   
-  const tables = ['Users', 'Orders', 'Aadhaar', 'BloodBank', 'Clothing', 'Electronics', 'Emergency', 'Household'];
+  const tables = ['Users', 'Orders', 'Aadhaar', 'BloodBank', 'Clothing', 'Electronics', 'Emergency', 'Household', 'ProviderProducts', 'PendingProducts'];
   for (const table of tables) {
     try {
       await connection.execute(`DROP TABLE [${table}]`);
@@ -44,7 +44,7 @@ async function setup() {
     `);
     console.log("Orders table created");
 
-    const categoryTables = ['Aadhaar', 'BloodBank', 'Clothing', 'Electronics', 'Emergency', 'Household'];
+    const categoryTables = ['Aadhaar', 'BloodBank', 'Clothing', 'Electronics', 'Emergency', 'Household', 'ProviderProducts', 'PendingProducts'];
     for(const table of categoryTables) {
         await connection.execute(`
           CREATE TABLE [${table}] (

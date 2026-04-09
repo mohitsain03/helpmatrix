@@ -47,14 +47,20 @@ function getTableName(category) {
   return map[category.toLowerCase()] || 'Household';
 }
 
-// GET Category Items API
+// GET Category Items API (Unified view of system + community products)
 app.get('/api/items/:category', async (req, res) => {
   try {
     const { category } = req.params;
     const tableName = getTableName(category);
     
-    // Query the specific category table
-    const rows = await query(`SELECT * FROM [${tableName}]`);
+    // Fetch from system table
+    const sysRows = await query(`SELECT * FROM [${tableName}]`);
+    
+    // Fetch from ProviderProducts where category matches
+    // Using a broad check since category names in ProviderProducts might be "Clothing" vs "clothing"
+    const communityRows = await query(`SELECT * FROM ProviderProducts WHERE Category = '${tableName}' OR Category = '${category}'`);
+    
+    const rows = [...sysRows, ...communityRows];
     
     const items = rows.map(r => ({
       id: r.ProductID,
@@ -62,9 +68,10 @@ app.get('/api/items/:category', async (req, res) => {
       meta: r.Meta || "",
       tags: (r.Tags || "").split(',').filter(t => t),
       price: r.Price,
-      image: r.Image,
-      badge: r.Badge,
-      isUrgent: r.IsUrgent === true || r.IsUrgent === -1
+      image: r.Image || "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=300&fit=crop",
+      badge: r.Badge || r.Status,
+      isUrgent: r.IsUrgent === true || r.IsUrgent === -1,
+      providerMobile: r.ProviderMobile
     }));
     
     res.json({ success: true, items });
@@ -165,45 +172,36 @@ app.get('/api/provider/orders/:mobile', async (req, res) => {
   }
 });
 
-// Products for a Provider
+// Products for a Provider (Active and Pending)
 app.get('/api/provider/products/:mobile', async (req, res) => {
   try {
     const { mobile } = req.params;
     
-    // Note: To find products by provider across all tables, we'd need to UNION or loop.
-    // For now, checking the Category associated with the user role might be more efficient,
-    // but here we'll just check the most common tables for the product list.
-    const tables = ['Electronics', 'Clothing', 'BloodBank', 'Aadhaar', 'Emergency', 'Household'];
-    let allProducts = [];
+    const active = await query(`SELECT * FROM ProviderProducts WHERE ProviderMobile = '${mobile}'`);
+    const pending = await query(`SELECT * FROM PendingProducts WHERE ProviderMobile = '${mobile}'`);
     
-    for(const table of tables) {
-        const rows = await query(`SELECT * FROM [${table}] WHERE ProviderMobile = '${mobile}'`);
-        allProducts = allProducts.concat(rows);
-    }
-    
-    res.json({ success: true, products: allProducts });
+    res.json({ success: true, active, pending });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Failed to fetch provider products' });
   }
 });
 
-// Add Product (Provider)
+// Add Product (Provider) -> Goes to PENDING
 app.post('/api/provider/products', async (req, res) => {
   try {
     const { id, mobile, name, category, price, status } = req.body;
-    const tableName = getTableName(category);
     
     await execute(`
-      INSERT INTO [${tableName}] (ProductID, ProviderMobile, ItemName, Price, [Status])
-      VALUES ('${id}', '${mobile}', '${name.replace(/'/g, "''")}', '${price}', '${status || "Pending"}')
+      INSERT INTO PendingProducts (ProductID, ProviderMobile, ItemName, Category, Price, [Status], [Badge])
+      VALUES ('${id}', '${mobile}', '${name.replace(/'/g, "''")}', '${category}', '${price}', 'Pending', 'Awaiting Approval')
     `);
     
-    res.json({ success: true });
+    res.json({ success: true, message: 'Product submitted for approval' });
   } catch (err) {
-    res.status(500).json({ success: false, error: 'Failed to add product' });
+    res.status(500).json({ success: false, error: 'Failed to submit product' });
   }
 });
 
 app.listen(3000, () => {
-  console.log('HelpMatrix Backend running on http://localhost:3000 (Multi-Table Access Mode)');
+  console.log('HelpMatrix Backend running on http://localhost:3000 (Provider Approval Mode)');
 });
