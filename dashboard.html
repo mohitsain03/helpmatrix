@@ -57,30 +57,65 @@
 
 <script src="main.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    // Load User Data
-    const userStr = localStorage.getItem('helpmatrix_user');
-    if (!userStr) {
-      window.location.href = 'login.html';
-      return;
-    }
-    const user = JSON.parse(userStr);
-    
-    document.getElementById('dash-name').textContent = user.name || 'User';
-    document.getElementById('dash-role').textContent = user.role === 'provider' ? 'Provider Account' : 'Consumer Account';
-    document.getElementById('dash-avatar').textContent = (user.name || 'U').charAt(0).toUpperCase();
+  (() => {
+    console.log("Dashboard IIFE Initializing...");
 
-    // Load Orders
-    const ordersContainer = document.getElementById('orders-container');
-    const API_BASE = (window.location.port !== '3000' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')) 
-      ? 'http://localhost:3000' 
-      : '';
-    const userMobile = user.mobile || 'Unknown';
-    fetch(`${API_BASE}/api/orders/` + userMobile)
-      .then(res => res.json())
-      .then(data => {
-        let orders = data.success ? data.orders : [];
+    const initDashboard = async () => {
+      // 1. Load User Data from LocalStorage
+      const userStr = localStorage.getItem('helpmatrix_user');
+      console.log("LocalStorage helpmatrix_user:", userStr);
+
+      if (!userStr) {
+        console.warn("No user session found, redirecting to login.");
+        window.location.href = 'login.html';
+        return;
+      }
+
+      let user;
+      try {
+        user = JSON.parse(userStr);
+        console.log("Parsed User Object:", user);
+      } catch (e) {
+        console.error("JSON parse failed for user session:", e);
+        localStorage.removeItem('helpmatrix_user');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // 2. Populate Sidebar Info
+      const nameEl = document.getElementById('dash-name');
+      const roleEl = document.getElementById('dash-role');
+      const avatarEl = document.getElementById('dash-avatar');
+
+      console.log("Elements found:", { nameEl: !!nameEl, roleEl: !!roleEl, avatarEl: !!avatarEl });
+
+      if (nameEl) nameEl.textContent = user.name || 'User';
+      if (roleEl) roleEl.textContent = (user.role || '').toLowerCase() === 'provider' ? 'Provider Account' : 'Consumer Account';
+      if (avatarEl) avatarEl.textContent = (user.name || 'U').charAt(0).toUpperCase();
+
+      // 3. Build API Base
+      const API_BASE = (window.location.port !== '3000' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')) 
+        ? 'http://localhost:3000' 
+        : '';
+      const userMobile = user.mobile || 'Unknown';
+      const ordersContainer = document.getElementById('orders-container');
+
+      if (!ordersContainer) {
+        console.error("orders-container element not found in DOM!");
+        return;
+      }
+
+      // 4. Fetch and Render Orders
+      console.log(`Fetching orders for ${userMobile} from ${API_BASE}/api/orders/${userMobile}...`);
+      try {
+        const res = await fetch(`${API_BASE}/api/orders/${userMobile}`);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        const data = await res.json();
+        
+        console.log("API Response Data:", data);
+        const orders = data.success ? data.orders : [];
         let totalAmount = 0;
+
         if (orders.length === 0) {
           ordersContainer.innerHTML = `
             <div style="text-align:center;padding:4rem 2rem;background:var(--glass-bg);border:1px dashed var(--glass-border);border-radius:16px;">
@@ -90,82 +125,84 @@
               <a href="index.html#categories" class="btn-primary">Browse Services</a>
             </div>
           `;
-        } else {
-          let ordersHtml = '';
-          // Reverse array so latest is first
-          [...orders].reverse().forEach(order => {
-            let statusColor = order.Status === 'Pending' ? '#eab308' : (order.Status === 'Accepted' ? '#22c55e' : (order.Status === 'Processing' ? '#3b82f6' : '#22c55e'));
-            // ADODB returns column names as they were defined (OrderID, Status, etc)
-            let oid = order.OrderID || order.ID || order.id || 'N/A';
-            let oitem = order.Item || order.item || 'Unknown Item';
-            let odeliv = order.Address || order.address || 'N/A';
-            let ourg = order.Urgency || order.urgency || 'Normal';
-            let odate = order.OrderDate || order.date || 'N/A';
-            let ostatus = order.Status || order.status || 'Pending';
-            let oprice = parseFloat((order.Price || order.price || '0').toString().replace(/[^0-9.]/g, '')) || 0;
-            totalAmount += oprice;
-            
-            ordersHtml += `
-              <div class="dash-card">
-                <div>
-                  <div style="color:var(--text-muted);font-size:0.8rem;margin-bottom:0.25rem;">Order ID: <span style="font-family:monospace;color:#fff;">${oid}</span> • ${odate}</div>
-                  <h4>${oitem}</h4>
-                  <p>Address: ${odeliv} • Urgency: <strong style="color:var(--accent-red);">${ourg}</strong></p>
-                  <div style="margin-top:0.5rem;font-weight:700;color:var(--accent-cyan);">Price: ₹${oprice.toLocaleString()}</div>
-                </div>
-                <div>
-                  <span class="status" style="background:rgba(234, 179, 8, 0.15);color:${statusColor};display:block;margin-bottom:0.5rem;">${ostatus === 'Accepted' ? 'Approved by Provider' : ostatus}</span>
-                  ${ostatus === 'Pending' ? `<button onclick="cancelOrder('${oid}')" style="background:rgba(239, 68, 68, 0.1); color:#ef4444; border:1px solid rgba(239, 68, 68, 0.2); padding:0.4rem 0.6rem; border-radius:6px; font-size:0.7rem; cursor:pointer; font-weight:600; width:100%;">Cancel Request</button>` : ''}
-                </div>
-              </div>
-            `;
-          });
-          
-          const summaryHtml = `
-            <div class="dash-card" style="background:linear-gradient(135deg, rgba(59,130,246,0.1), rgba(6,182,212,0.1)); border-color:var(--accent-blue);">
+          return;
+        }
+
+        const ordersHtml = [...orders].reverse().map(order => {
+          const status = order.Status || 'Pending';
+          const statusColor = status === 'Pending' ? '#eab308' : (status === 'Accepted' ? '#22c55e' : (status === 'Processing' ? '#3b82f6' : '#22c55e'));
+          const oid = order.OrderID || 'N/A';
+          const opriceStr = (order.Price || '0').toString();
+          const oprice = parseFloat(opriceStr.replace(/[^0-9.]/g, '')) || 0;
+          totalAmount += oprice;
+
+          return `
+            <div class="dash-card">
               <div>
-                <h3 style="color:#fff;margin-bottom:0.25rem;">Order Summary</h3>
-                <p style="color:var(--text-muted);">Total requests across all categories</p>
+                <div style="color:var(--text-muted);font-size:0.8rem;margin-bottom:0.25rem;">Order ID: <span style="font-family:monospace;color:#fff;">${oid}</span> • ${order.OrderDate || 'N/A'}</div>
+                <h4>${order.Item || 'Unknown Item'}</h4>
+                <p>Address: ${order.Address || 'N/A'} • Urgency: <strong style="color:var(--accent-red);">${order.Urgency || 'Normal'}</strong></p>
+                <div style="margin-top:0.5rem;font-weight:700;color:var(--accent-cyan);">Price: ₹${oprice.toLocaleString()}</div>
               </div>
               <div style="text-align:right;">
-                <div style="font-size:0.8rem;color:var(--text-muted);">Total Amount</div>
-                <div style="font-size:1.8rem;font-weight:800;color:var(--accent-cyan);font-family:'Orbitron',monospace;">₹${totalAmount.toLocaleString()}</div>
+                <span class="status" style="background:rgba(234, 179, 8, 0.15);color:${statusColor};display:block;margin-bottom:0.5rem;">${status === 'Accepted' ? 'Approved by Provider' : status}</span>
+                ${status === 'Pending' ? `<button onclick="cancelOrder('${oid}')" style="background:rgba(239, 68, 68, 0.1); color:#ef4444; border:1px solid rgba(239, 68, 68, 0.2); padding:0.4rem 0.6rem; border-radius:6px; font-size:0.7rem; cursor:pointer; font-weight:600; width:100%;">Cancel Request</button>` : ''}
               </div>
             </div>
           `;
-          
-          ordersContainer.innerHTML = summaryHtml + ordersHtml;
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        ordersContainer.innerHTML = '<p style="color:#ef4444;">Error loading orders from database.</p>';
-      });
-    });
-    
-    window.cancelOrder = (orderId) => {
-      if (!confirm('Are you sure you want to cancel this request?')) return;
-      
-      const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
-      fetch(`${API_BASE}/api/orders/${orderId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'Cancelled' })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          location.reload();
-        } else {
-          alert('Failed to cancel order');
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        alert('Network error while cancelling order');
-      });
+        }).join('');
+
+        const summaryHtml = `
+          <div class="dash-card" style="background:linear-gradient(135deg, rgba(59,130,246,0.1), rgba(6,182,212,0.1)); border-color:var(--accent-blue);">
+            <div>
+              <h3 style="color:#fff;margin-bottom:0.25rem;">Order Summary</h3>
+              <p style="color:var(--text-muted);">Total requests across all categories</p>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:0.8rem;color:var(--text-muted);">Total Amount</div>
+              <div style="font-size:1.8rem;font-weight:800;color:var(--accent-cyan);font-family:'Orbitron',monospace;">₹${totalAmount.toLocaleString()}</div>
+            </div>
+          </div>
+        `;
+
+        ordersContainer.innerHTML = summaryHtml + ordersHtml;
+      } catch (err) {
+        console.error("Order load error:", err);
+        ordersContainer.innerHTML = `<p style="color:#ef4444;text-align:center;">Error loading orders: ${err.message}</p>`;
+      }
     };
-  });
+
+    // Execute immediately or when DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initDashboard);
+    } else {
+      initDashboard();
+    }
+  })();
+
+  window.cancelOrder = (orderId) => {
+    if (!confirm('Are you sure you want to cancel this request?')) return;
+    
+    const API_BASE = (window.location.port !== '3000' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) ? 'http://localhost:3000' : '';
+    fetch(`${API_BASE}/api/orders/${orderId}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'Cancelled' })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert('Failed to cancel order: ' + (data.error || 'Unknown error'));
+      }
+    })
+    .catch(err => {
+      console.error("Cancel order error:", err);
+      alert('Network error while cancelling order');
+    });
+  };
+
 </script>
 </body>
 </html>

@@ -242,7 +242,8 @@ function initAuth() {
         const loginBtn = navLinks.querySelector('a[href="login.html"]');
         if (loginBtn) {
           const li = loginBtn.parentElement;
-          const dashUrl = user.role === 'provider' ? 'provider-dashboard.html' : 'dashboard.html';
+          const role = (user.role || '').toLowerCase();
+          const dashUrl = role === 'provider' ? 'provider-dashboard.html' : 'dashboard.html';
           li.innerHTML = `<a href="${dashUrl}" class="nav-cta" style="background: linear-gradient(135deg, #8b5cf6, #3b82f6);">Dashboard</a>`;
           
           const logoutLi = document.createElement('li');
@@ -345,7 +346,10 @@ function initLoginPage() {
         }
         localStorage.setItem('helpmatrix_user', JSON.stringify(data.user));
         showToast('Login successful! Welcome back.');
-        setTimeout(() => { window.location.href = currentRole === 'provider' ? 'provider-dashboard.html' : 'index.html'; }, 800);
+        setTimeout(() => { 
+          const role = (data.user.role || '').toLowerCase();
+          window.location.href = role === 'provider' ? 'provider-dashboard.html' : 'index.html'; 
+        }, 800);
       })
       .catch(err => {
         console.error('Login error:', err);
@@ -404,7 +408,10 @@ function initLoginPage() {
         }
         localStorage.setItem('helpmatrix_user', JSON.stringify({ name, role: currentRole, mobile }));
         showToast('Account created! Welcome to HelpMatrix');
-        setTimeout(() => { window.location.href = currentRole === 'provider' ? 'dashboard.html' : 'index.html'; }, 800);
+        setTimeout(() => { 
+          const role = (currentRole || '').toLowerCase();
+          window.location.href = role === 'provider' ? 'provider-dashboard.html' : 'index.html'; 
+        }, 800);
       })
       .catch(err => {
         console.error('Registration error:', err);

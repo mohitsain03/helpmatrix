@@ -92,7 +92,6 @@
       ? 'http://localhost:3000' 
       : '';
 
-    // 1. Load Incoming Orders
     fetch(`${API_BASE}/api/provider/orders/` + mobile)
       .then(res => res.json())
       .then(data => {
@@ -123,9 +122,12 @@
             </div>
           `).join('');
         }
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById('orders-container').innerHTML = '<p style="color:#ef4444;text-align:center;">Failed to load pending orders.</p>';
       });
 
-    // 2. Load My Requests (User's consumer orders)
     fetch(`${API_BASE}/api/orders/` + mobile)
       .then(res => res.json())
       .then(data => {
@@ -153,6 +155,10 @@
             </div>
           `).join('');
         }
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById('products-container').innerHTML = '<p style="color:#ef4444;text-align:center;">Failed to load your requests.</p>';
       });
 
     // 3. Approve Order Function

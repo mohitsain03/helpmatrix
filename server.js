@@ -58,7 +58,7 @@ app.get('/api/items/:category', async (req, res) => {
     
     // Fetch from ProviderProducts where category matches
     // Using a broad check since category names in ProviderProducts might be "Clothing" vs "clothing"
-    const communityRows = await query(`SELECT * FROM ProviderProducts WHERE Category = '${tableName}' OR Category = '${category}'`);
+    const communityRows = await query(`SELECT * FROM ProviderProducts WHERE [Category] = '${tableName}' OR [Category] = '${category}'`);
     
     const rows = [...sysRows, ...communityRows];
     
@@ -85,13 +85,13 @@ app.post('/api/register', async (req, res) => {
   try {
     const { name, mobile, address, password, role, category, org } = req.body;
     
-    const existing = await query(`SELECT * FROM Users WHERE Mobile = '${mobile}' AND Role = '${role}'`);
+    const existing = await query(`SELECT * FROM Users WHERE Mobile = '${mobile}' AND [Role] = '${role}'`);
     if (existing.length > 0) {
       return res.status(400).json({ error: 'User already exists in this role. Please login.' });
     }
 
     await execute(`
-      INSERT INTO Users (FullName, Mobile, Address, [Password], Role, Category, Org)
+      INSERT INTO Users (FullName, Mobile, Address, [Password], [Role], [Category], Org)
       VALUES ('${name}', '${mobile}', '${address.replace(/'/g, "''")}', '${password}', '${role}', '${category || ""}', '${org || ""}')
     `);
     
@@ -105,10 +105,10 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', async (req, res) => {
   try {
     const { mobile, password, role } = req.body;
-    const users = await query(`SELECT * FROM Users WHERE Mobile = '${mobile}' AND [Password] = '${password}' AND Role = '${role}'`);
+    const users = await query(`SELECT * FROM [Users] WHERE [Mobile] = '${mobile}' AND [Password] = '${password}' AND [Role] = '${role}'`);
     
     if (users.length === 0) {
-      return res.status(401).json({ error: 'Invalid credentials or role mismatch!' });
+      return res.status(401).json({ error: 'Invalid credentials or [Role] mismatch!' });
     }
     
     const user = users[0];
@@ -123,10 +123,10 @@ app.post('/api/orders', async (req, res) => {
   try {
     const { id, userMobile, item, address, urgency, status, category, date, price, providerMobile } = req.body;
     
-    await execute(`
-      INSERT INTO Orders (OrderID, UserMobile, Item, Address, Urgency, Status, Category, OrderDate, Price, ProviderMobile)
-      VALUES ('${id}', '${userMobile}', '${item.replace(/'/g, "''")}', '${address.replace(/'/g, "''")}', '${urgency}', '${status}', '${category || ""}', '${date}', '${price || "0"}', '${providerMobile || "Not Assigned"}')
-    `);
+      await execute(`
+        INSERT INTO Orders (OrderID, UserMobile, Item, Address, Urgency, [Status], [Category], OrderDate, Price, ProviderMobile)
+        VALUES ('${id}', '${userMobile}', '${item.replace(/'/g, "''")}', '${address.replace(/'/g, "''")}', '${urgency}', '${status}', '${category || ""}', '${date}', '${price || "0"}', '${providerMobile || "Not Assigned"}')
+      `);
     
     res.json({ success: true });
   } catch (err) {
@@ -138,7 +138,7 @@ app.post('/api/orders', async (req, res) => {
 app.get('/api/orders/:mobile', async (req, res) => {
   try {
     const { mobile } = req.params;
-    const rows = await query(`SELECT * FROM Orders WHERE UserMobile = '${mobile}'`);
+    const rows = await query(`SELECT * FROM [Orders] WHERE [UserMobile] = '${mobile}'`);
     res.json({ success: true, orders: rows });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Failed to fetch orders' });
@@ -152,8 +152,8 @@ app.get('/api/provider/orders/:mobile', async (req, res) => {
     
     // Fetch orders: Any 'Pending' order in the system should appear for approval
     const rows = await query(`
-      SELECT * FROM Orders 
-      WHERE Status = 'Pending' OR ProviderMobile = '${mobile}'
+      SELECT * FROM [Orders] 
+      WHERE [Status] = 'Pending' OR [ProviderMobile] = '${mobile}'
       ORDER BY OrderDate DESC
     `);
 
@@ -182,8 +182,7 @@ app.post('/api/provider/products', async (req, res) => {
   try {
     const { id, mobile, name, category, price, status } = req.body;
     
-    await execute(`
-      INSERT INTO ProviderProducts (ProductID, ProviderMobile, ItemName, Category, Price, [Status], [Badge])
+      INSERT INTO ProviderProducts (ProductID, ProviderMobile, ItemName, [Category], [Price], [Status], [Badge])
       VALUES ('${id}', '${mobile}', '${name.replace(/'/g, "''")}', '${category}', '${price}', 'Active', 'In Stock')
     `);
     
