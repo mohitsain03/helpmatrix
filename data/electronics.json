@@ -3,7 +3,10 @@
     "id": "elec-1",
     "name": "Dell Inspiron Laptop",
     "meta": "Intel i5, 8GB RAM · Borrow up to 7 days · Delhi",
-    "tags": ["Laptop", "Computing"],
+    "tags": [
+      "Laptop",
+      "Computing"
+    ],
     "price": "FREE Borrow",
     "image": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop",
     "badge": "Available"
@@ -12,7 +15,10 @@
     "id": "elec-2",
     "name": "Redmi Note 11 Smartphone",
     "meta": "Android, 64GB · Borrow up to 3 days · Mumbai",
-    "tags": ["Mobile", "Android"],
+    "tags": [
+      "Mobile",
+      "Android"
+    ],
     "price": "FREE Borrow",
     "image": "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&h=300&fit=crop",
     "badge": "Available"
@@ -21,7 +27,10 @@
     "id": "elec-3",
     "name": "Samsung Tab A7 Tablet",
     "meta": "10.4\" Display · For study/exams · Pune",
-    "tags": ["Tablet", "Education"],
+    "tags": [
+      "Tablet",
+      "Education"
+    ],
     "price": "FREE Borrow",
     "image": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop",
     "badge": "In Demand",
@@ -31,7 +40,10 @@
     "id": "elec-4",
     "name": "Table Fan (Havells)",
     "meta": "400mm, Works perfectly · Borrow: 7 days · Bangalore",
-    "tags": ["Appliance", "Fan"],
+    "tags": [
+      "Appliance",
+      "Fan"
+    ],
     "price": "FREE Borrow",
     "image": "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&h=300&fit=crop",
     "badge": "Available"
@@ -40,7 +52,10 @@
     "id": "elec-5",
     "name": "Universal Phone Charger Kit",
     "meta": "USB-C + Micro USB + Lightning · Hyderabad",
-    "tags": ["Charger", "Accessories"],
+    "tags": [
+      "Charger",
+      "Accessories"
+    ],
     "price": "FREE Borrow",
     "image": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop",
     "badge": "Available"
@@ -49,7 +64,10 @@
     "id": "elec-6",
     "name": "20,000 mAh Power Bank",
     "meta": "Anker 20K · Fully charged · Chennai",
-    "tags": ["Power Bank", "Mobile"],
+    "tags": [
+      "Power Bank",
+      "Mobile"
+    ],
     "price": "FREE Borrow",
     "image": "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&h=300&fit=crop",
     "badge": "Available"
@@ -58,7 +76,10 @@
     "id": "elec-7",
     "name": "DSLR Camera (Canon 1500D)",
     "meta": "With 18-55mm lens · Borrow: 2 days · Kolkata",
-    "tags": ["Camera", "DSLR"],
+    "tags": [
+      "Camera",
+      "DSLR"
+    ],
     "price": "FREE Borrow",
     "image": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop",
     "badge": "Available"
@@ -67,7 +88,10 @@
     "id": "elec-8",
     "name": "HP LaserJet Printer",
     "meta": "Laser, Black & White · Borrow: 1 day · Jaipur",
-    "tags": ["Printer", "Office"],
+    "tags": [
+      "Printer",
+      "Office"
+    ],
     "price": "FREE Borrow",
     "image": "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&h=300&fit=crop",
     "badge": "Available"
@@ -76,7 +100,10 @@
     "id": "elec-9",
     "name": "Extension Board 6-in-1 + Surge",
     "meta": "3m wire · Surge protected · Ahmedabad",
-    "tags": ["Extension", "Power"],
+    "tags": [
+      "Extension",
+      "Power"
+    ],
     "price": "FREE Borrow",
     "image": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop",
     "badge": "Available"
@@ -85,10 +112,24 @@
     "id": "elec-10",
     "name": "Mini Projector (1080p)",
     "meta": "With HDMI & remote · Borrow: 1 day · Surat",
-    "tags": ["Projector", "Events"],
+    "tags": [
+      "Projector",
+      "Events"
+    ],
     "price": "FREE Borrow",
     "image": "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&h=300&fit=crop",
     "badge": "Popular",
     "isUrgent": true
+  },
+  {
+    "id": "P-20587",
+    "name": "headphones",
+    "meta": "Provider: 1111111111 · Availability: Active",
+    "tags": [
+      "Electronics"
+    ],
+    "price": "₹1500",
+    "image": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop",
+    "badge": "Active"
   }
 ]

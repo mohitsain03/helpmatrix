@@ -16,5 +16,23 @@
     "Role": "Provider",
     "Category": "Clothing",
     "Org": "HelpMatrix NGOs"
+  },
+  {
+    "FullName": "mohit",
+    "Mobile": "1111111111",
+    "Address": "ldh",
+    "Password": "123456",
+    "Role": "provider",
+    "Category": "clothing",
+    "Org": "crazyvasm"
+  },
+  {
+    "FullName": "vishal",
+    "Mobile": "2222222222",
+    "Address": "ldh",
+    "Password": "123456",
+    "Role": "consumer",
+    "Category": "",
+    "Org": ""
   }
 ]
