@@ -149,20 +149,14 @@ app.get('/api/orders/:mobile', async (req, res) => {
 app.get('/api/provider/orders/:mobile', async (req, res) => {
   try {
     const { mobile } = req.params;
-    let rows = await query(`SELECT * FROM Orders WHERE ProviderMobile = '${mobile}'`);
     
-    // 1. Get Provider info to know their category
-    const providers = await query(`SELECT Category FROM Users WHERE Mobile = '${mobile}' AND Role = 'provider'`);
-    if (providers.length > 0) {
-      const providerCategory = providers[0].Category;
-      // 2. Fetch orders: Specifically assigned OR unassigned matching category
-      rows = await query(`
-        SELECT * FROM Orders 
-        WHERE (ProviderMobile = '${mobile}' OR ProviderMobile = 'Not Assigned')
-        AND Status = 'Pending'
-        ORDER BY OrderDate DESC
-      `);
-    }
+    // Fetch orders: Specifically assigned to this provider OR unassigned 'Pending' orders
+    const rows = await query(`
+      SELECT * FROM Orders 
+      WHERE (ProviderMobile = '${mobile}' OR ProviderMobile = 'Not Assigned')
+      AND Status = 'Pending'
+      ORDER BY OrderDate DESC
+    `);
 
     res.json({ success: true, orders: rows });
   } catch (err) {

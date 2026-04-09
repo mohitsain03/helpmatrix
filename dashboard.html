@@ -72,7 +72,9 @@
 
     // Load Orders
     const ordersContainer = document.getElementById('orders-container');
-    const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
+    const API_BASE = (window.location.port !== '3000' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')) 
+      ? 'http://localhost:3000' 
+      : '';
     const userMobile = user.mobile || 'Unknown';
     fetch(`${API_BASE}/api/orders/` + userMobile)
       .then(res => res.json())
