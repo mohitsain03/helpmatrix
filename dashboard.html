@@ -112,7 +112,8 @@
                   <div style="margin-top:0.5rem;font-weight:700;color:var(--accent-cyan);">Price: ₹${oprice.toLocaleString()}</div>
                 </div>
                 <div>
-                  <span class="status" style="background:rgba(234, 179, 8, 0.15);color:${statusColor};">${ostatus}</span>
+                  <span class="status" style="background:rgba(234, 179, 8, 0.15);color:${statusColor};display:block;margin-bottom:0.5rem;">${ostatus === 'Accepted' ? 'Approved by Provider' : ostatus}</span>
+                  ${ostatus === 'Pending' ? `<button onclick="cancelOrder('${oid}')" style="background:rgba(239, 68, 68, 0.1); color:#ef4444; border:1px solid rgba(239, 68, 68, 0.2); padding:0.4rem 0.6rem; border-radius:6px; font-size:0.7rem; cursor:pointer; font-weight:600; width:100%;">Cancel Request</button>` : ''}
                 </div>
               </div>
             `;
@@ -138,6 +139,30 @@
         console.error(err);
         ordersContainer.innerHTML = '<p style="color:#ef4444;">Error loading orders from database.</p>';
       });
+    });
+    
+    window.cancelOrder = (orderId) => {
+      if (!confirm('Are you sure you want to cancel this request?')) return;
+      
+      const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
+      fetch(`${API_BASE}/api/orders/${orderId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'Cancelled' })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        } else {
+          alert('Failed to cancel order');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Network error while cancelling order');
+      });
+    };
   });
 </script>
 </body>

@@ -158,7 +158,7 @@ app.get('/api/provider/orders/:mobile', async (req, res) => {
       // 2. Fetch orders: Specifically assigned OR unassigned matching category
       rows = await query(`
         SELECT * FROM Orders 
-        WHERE (ProviderMobile = '${mobile}' OR (ProviderMobile = 'Not Assigned' AND (Category = '${providerCategory}' OR Category = 'General')))
+        WHERE (ProviderMobile = '${mobile}' OR ProviderMobile = 'Not Assigned')
         AND Status = 'Pending'
         ORDER BY OrderDate DESC
       `);
