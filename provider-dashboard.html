@@ -41,7 +41,7 @@
   <!-- STATS -->
   <div class="provider-grid">
     <div class="stat-card">
-      <div style="color:var(--text-muted);font-size:0.8rem;">My Requests</div>
+      <div style="color:var(--text-muted);font-size:0.8rem;">My Products</div>
       <div class="stat-val" id="stat-products">0</div>
     </div>
     <div class="stat-card">
@@ -65,11 +65,45 @@
 
   <!-- MY REQUESTS (OUTGOING) -->
   <div class="section-title">
-    <h2>My Requests <span style="font-size:0.9rem;font-weight:400;color:var(--text-muted);" id="products-count">(0)</span></h2>
+    <h2>My Products <span style="font-size:0.9rem;font-weight:400;color:var(--text-muted);" id="products-count">(0)</span></h2>
+    <button class="btn-primary" style="padding:0.6rem 1.2rem;font-size:0.85rem;" onclick="openAddModal()">+ Add New Product</button>
   </div>
   <div id="products-container" class="orders-list">
     <!-- Consumer orders load here -->
     <p style="color:var(--text-muted);text-align:center;padding:2rem;">Loading your requests...</p>
+  </div>
+</div>
+</div>
+
+<!-- ADD PRODUCT MODAL -->
+<div class="modal-overlay" id="add-product-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 class="modal-title">Add New Product</h3>
+      <button class="modal-close" onclick="closeAddModal()">&times;</button>
+    </div>
+    <form id="add-product-form">
+      <div class="form-group">
+        <label class="form-label">Product Name</label>
+        <input type="text" id="p-name" class="form-input" placeholder="e.g. Professional Laptop Repair" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select id="p-category" class="form-select" required>
+          <option value="Electronics">Electronics</option>
+          <option value="Clothing">Clothing</option>
+          <option value="Household">Household</option>
+          <option value="Aadhaar">Aadhaar Services</option>
+          <option value="BloodBank">Blood Bank</option>
+          <option value="Emergency">Emergency Helpline</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Price / Listing Amount</label>
+        <input type="text" id="p-price" class="form-input" placeholder="e.g. 500 or Free" required>
+      </div>
+      <button type="submit" class="submit-btn" style="margin-top:1rem;" id="add-submit-btn">List Product</button>
+    </form>
   </div>
 </div>
 
@@ -128,40 +162,93 @@
         document.getElementById('orders-container').innerHTML = '<p style="color:#ef4444;text-align:center;">Failed to load pending orders.</p>';
       });
 
-    fetch(`${API_BASE}/api/orders/` + mobile)
+    // 2. Load MY PRODUCTS (Inventory)
+    function loadMyProducts() {
+      fetch(`${API_BASE}/api/provider/products/` + mobile)
+        .then(res => res.json())
+        .then(data => {
+          const products = data.success ? data.active : [];
+          const pending = data.success ? data.pending : [];
+          const all = [...products, ...pending];
+          
+          document.getElementById('stat-products').textContent = all.length;
+          document.getElementById('products-count').textContent = `(${all.length})`;
+
+          const container = document.getElementById('products-container');
+          
+          if (all.length === 0) {
+            container.innerHTML = '<div class="dash-card" style="justify-content:center;color:var(--text-muted);">No products listed yet. Click "+ Add New Product" to start.</div>';
+          } else {
+            container.innerHTML = all.map(p => `
+              <div class="dash-card">
+                <div>
+                  <div style="color:var(--text-muted);font-size:0.7rem;">Product ID: ${p.ProductID} • ${p.Category}</div>
+                  <h4 style="margin:0.25rem 0;">${p.ItemName}</h4>
+                  <div style="color:var(--accent-cyan);font-weight:700;margin-top:0.5rem;">Price: ₹${p.Price}</div>
+                </div>
+                <div style="text-align:right;">
+                  <span class="status" style="background:${p.Status === 'Active' ? 'rgba(34,197,94,0.1)' : 'rgba(234,179,8,0.1)'};color:${p.Status === 'Active' ? '#22c55e' : '#eab308'};">
+                    ${p.Status}
+                  </span>
+                </div>
+              </div>
+            `).join('');
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById('products-container').innerHTML = '<p style="color:#ef4444;text-align:center;">Failed to load your inventory.</p>';
+        });
+    }
+
+    loadMyProducts();
+
+    // 3. Modal Controls
+    window.openAddModal = () => {
+      document.getElementById('add-product-modal').classList.add('active');
+    };
+    window.closeAddModal = () => {
+      document.getElementById('add-product-modal').classList.remove('active');
+    };
+
+    // 4. Add Product Form Submission
+    document.getElementById('add-product-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('add-submit-btn');
+      btn.textContent = 'Listing Content...';
+      btn.disabled = true;
+
+      const name = document.getElementById('p-name').value;
+      const category = document.getElementById('p-category').value;
+      const price = document.getElementById('p-price').value;
+      const id = 'HM-' + Math.floor(100000 + Math.random() * 900000);
+
+      fetch(`${API_BASE}/api/provider/products`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, mobile, name, category, price })
+      })
       .then(res => res.json())
       .then(data => {
-        const requests = data.success ? data.orders : [];
-        
-        document.getElementById('stat-products').textContent = requests.length;
-        document.getElementById('products-count').textContent = `(${requests.length})`;
-
-        const container = document.getElementById('products-container');
-        
-        if (requests.length === 0) {
-          container.innerHTML = '<div class="dash-card" style="justify-content:center;color:var(--text-muted);">No requests made yet.</div>';
+        if (data.success) {
+          closeAddModal();
+          document.getElementById('add-product-form').reset();
+          loadMyProducts(); // Refresh list
         } else {
-          container.innerHTML = [...requests].reverse().map(r => `
-            <div class="dash-card">
-              <div>
-                <div style="color:var(--text-muted);font-size:0.7rem;">Order ID: ${r.OrderID} • ${r.OrderDate}</div>
-                <h4 style="margin:0.25rem 0;">${r.Item}</h4>
-                <p>Status: <span style="color:${r.Status === 'Pending' ? '#eab308' : '#22c55e'};">${r.Status}</span></p>
-                <div style="color:var(--accent-cyan);font-weight:700;margin-top:0.5rem;">Price: ₹${r.Price}</div>
-              </div>
-              <div style="text-align:right;">
-                <span class="status" style="background:rgba(59,130,246,0.1);color:#3b82f6;">Outgoing</span>
-              </div>
-            </div>
-          `).join('');
+          alert('Failed to list product: ' + (data.error || 'Unknown error'));
         }
       })
       .catch(err => {
         console.error(err);
-        document.getElementById('products-container').innerHTML = '<p style="color:#ef4444;text-align:center;">Failed to load your requests.</p>';
+        alert('Network error while listing product');
+      })
+      .finally(() => {
+        btn.textContent = 'List Product';
+        btn.disabled = false;
       });
+    });
 
-    // 3. Approve Order Function
+    // 5. Approve Order Function
     window.approveOrder = (orderId) => {
       const btn = document.getElementById(`btn-${orderId}`);
       if (btn) { btn.textContent = 'Processing...'; btn.disabled = true; }

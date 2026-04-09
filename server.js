@@ -182,6 +182,7 @@ app.post('/api/provider/products', async (req, res) => {
   try {
     const { id, mobile, name, category, price, status } = req.body;
     
+    await execute(`
       INSERT INTO ProviderProducts (ProductID, ProviderMobile, ItemName, [Category], [Price], [Status], [Badge])
       VALUES ('${id}', '${mobile}', '${name.replace(/'/g, "''")}', '${category}', '${price}', 'Active', 'In Stock')
     `);
