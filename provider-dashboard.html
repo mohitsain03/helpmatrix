@@ -41,7 +41,7 @@
   <!-- STATS -->
   <div class="provider-grid">
     <div class="stat-card">
-      <div style="color:var(--text-muted);font-size:0.8rem;">Active Products</div>
+      <div style="color:var(--text-muted);font-size:0.8rem;">My Requests</div>
       <div class="stat-val" id="stat-products">0</div>
     </div>
     <div class="stat-card">
@@ -63,50 +63,17 @@
     <p style="color:var(--text-muted);text-align:center;padding:2rem;">Loading pending orders...</p>
   </div>
 
-  <!-- MY PRODUCTS -->
+  <!-- MY REQUESTS (OUTGOING) -->
   <div class="section-title">
-    <h2>My Products <span style="font-size:0.9rem;font-weight:400;color:var(--text-muted);" id="products-count">(0)</span></h2>
-    <button class="btn-primary" style="padding:0.5rem 1rem;font-size:0.8rem;" onclick="openProductModal()">+ Add Product</button>
+    <h2>My Requests <span style="font-size:0.9rem;font-weight:400;color:var(--text-muted);" id="products-count">(0)</span></h2>
   </div>
   <div id="products-container" class="orders-list">
-    <!-- Products load here -->
-    <p style="color:var(--text-muted);text-align:center;padding:2rem;">Loading your inventory...</p>
+    <!-- Consumer orders load here -->
+    <p style="color:var(--text-muted);text-align:center;padding:2rem;">Loading your requests...</p>
   </div>
 </div>
 
-<!-- ADD PRODUCT MODAL -->
-<div id="product-modal" class="modal-overlay">
-  <div class="modal-card">
-    <div class="modal-header">
-      <h3 class="modal-title">List New Product</h3>
-      <button class="modal-close" id="close-product-modal" style="background:none;border:none;font-size:1.5rem;color:var(--text-muted);cursor:pointer;">&times;</button>
-    </div>
-    <form id="product-form">
-      <div class="form-group">
-        <label class="form-label">Product Name</label>
-        <input type="text" id="p-name" class="form-input" placeholder="e.g. Winter Jacket" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Category</label>
-        <select id="p-category" class="form-input">
-          <option value="Clothing">Clothing</option>
-          <option value="Medical">Medical</option>
-          <option value="Food">Food</option>
-          <option value="Electronics">Electronics</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Price (₹)</label>
-        <input type="number" id="p-price" class="form-input" placeholder="0" required>
-      </div>
-      <div style="display:flex;gap:1rem;margin-top:2rem;">
-        <button type="button" class="btn-secondary" style="flex:1;" id="cancel-product">Cancel</button>
-        <button type="submit" class="submit-btn" style="flex:1;margin-top:0;" id="save-product">Save Listing</button>
-      </div>
-    </form>
-  </div>
-</div>
+
 
 <script src="main.js"></script>
 <script>
@@ -156,37 +123,33 @@
         }
       });
 
-    // 2. Load My Products (Active only)
-    fetch(`${API_BASE}/api/provider/products/` + mobile)
+    // 2. Load My Requests (User's consumer orders)
+    fetch(`${API_BASE}/api/orders/` + mobile)
       .then(res => res.json())
       .then(data => {
-        const active = data.success ? data.active : [];
+        const requests = data.success ? data.orders : [];
         
-        document.getElementById('stat-products').textContent = active.length;
-        document.getElementById('products-count').textContent = `(${active.length})`;
+        document.getElementById('stat-products').textContent = requests.length;
+        document.getElementById('products-count').textContent = `(${requests.length})`;
 
         const container = document.getElementById('products-container');
         
-        let html = '';
-        
-        if (active.length > 0) {
-          html += active.map(p => `
+        if (requests.length === 0) {
+          container.innerHTML = '<div class="dash-card" style="justify-content:center;color:var(--text-muted);">No requests made yet.</div>';
+        } else {
+          container.innerHTML = [...requests].reverse().map(r => `
             <div class="dash-card">
               <div>
-                <h4 style="margin:0;">${p.ItemName}</h4>
-                <p>Category: ${p.Category} • Listed Price: ₹${p.Price}</p>
+                <div style="color:var(--text-muted);font-size:0.7rem;">Order ID: ${r.OrderID} • ${r.OrderDate}</div>
+                <h4 style="margin:0.25rem 0;">${r.Item}</h4>
+                <p>Status: <span style="color:${r.Status === 'Pending' ? '#eab308' : '#22c55e'};">${r.Status}</span></p>
+                <div style="color:var(--accent-cyan);font-weight:700;margin-top:0.5rem;">Price: ₹${r.Price}</div>
               </div>
               <div style="text-align:right;">
-                <span class="status" style="background:rgba(34,197,94,0.1);color:#22c55e;">Active</span>
+                <span class="status" style="background:rgba(59,130,246,0.1);color:#3b82f6;">Outgoing</span>
               </div>
             </div>
           `).join('');
-        }
-
-        if (active.length === 0) {
-          container.innerHTML = '<div class="dash-card" style="justify-content:center;color:var(--text-muted);">No products listed yet.</div>';
-        } else {
-          container.innerHTML = html;
         }
       });
 
@@ -226,49 +189,7 @@
     };
   });
 
-  // Modal Logic
-  const pModal = document.getElementById('product-modal');
-  const pForm = document.getElementById('product-form');
-  
-  function openProductModal() { pModal.classList.add('active'); }
-  function closeProductModal() { pModal.classList.add('active'); pModal.classList.remove('active'); }
-  
-  document.getElementById('close-product-modal').onclick = closeProductModal;
-  document.getElementById('cancel-product').onclick = closeProductModal;
 
-  pForm.onsubmit = (e) => {
-    e.preventDefault();
-    const user = JSON.parse(localStorage.getItem('helpmatrix_user'));
-    const btn = document.getElementById('save-product');
-    btn.textContent = 'Saving...';
-    btn.disabled = true;
-
-    const newProduct = {
-      id: 'P-' + Math.floor(Math.random()*100000),
-      mobile: user.mobile,
-      name: document.getElementById('p-name').value,
-      category: document.getElementById('p-category').value,
-      price: document.getElementById('p-price').value,
-      status: 'Active'
-    };
-
-    const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
-    fetch(`${API_BASE}/api/provider/products`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newProduct)
-    })
-    .then(res => res.json())
-    .then(data => {
-      if(data.success) {
-        location.reload(); 
-      } else {
-        alert('Error saving product');
-        btn.textContent = 'Save Listing';
-        btn.disabled = false;
-      }
-    });
-  };
 </script>
 </body>
 </html>
