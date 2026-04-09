@@ -1,0 +1,94 @@
+[
+  {
+    "id": "house-1",
+    "name": "Sunita Devi — Deep Cleaner",
+    "meta": "5 yrs exp · Verified · ★4.9 (142 reviews) · Delhi",
+    "tags": ["Cleaning", "Deep Clean"],
+    "price": "₹300/hr",
+    "image": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&h=300&fit=crop",
+    "badge": "Available Today"
+  },
+  {
+    "id": "house-2",
+    "name": "Ramesh Kumar — Home Cook",
+    "meta": "North Indian cuisine · ★4.8 · Mumbai",
+    "tags": ["Cooking", "Daily Meals"],
+    "price": "₹500/day",
+    "image": "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=400&h=300&fit=crop",
+    "badge": "Available Today"
+  },
+  {
+    "id": "house-3",
+    "name": "Anil Singh — Emergency Plumber",
+    "meta": "24/7 available · ★4.9 · Bangalore",
+    "tags": ["Plumbing", "Emergency", "24/7"],
+    "price": "₹400/hr",
+    "image": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&h=300&fit=crop",
+    "badge": "Urgent",
+    "isUrgent": true
+  },
+  {
+    "id": "house-4",
+    "name": "Mohan Rao — Licensed Electrician",
+    "meta": "10 yrs exp · ★4.7 · Hyderabad",
+    "tags": ["Electrical", "Wiring"],
+    "price": "₹350/hr",
+    "image": "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=400&h=300&fit=crop",
+    "badge": "Available"
+  },
+  {
+    "id": "house-5",
+    "name": "Suresh Tiwari — Carpenter",
+    "meta": "Furniture & repair · ★4.8 · Pune",
+    "tags": ["Carpentry", "Furniture"],
+    "price": "₹450/hr",
+    "image": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&h=300&fit=crop",
+    "badge": "Available"
+  },
+  {
+    "id": "house-6",
+    "name": "Meena Nair — Babysitter / Nanny",
+    "meta": "CPR certified · ★5.0 · Chennai",
+    "tags": ["Childcare", "Nanny"],
+    "price": "₹600/day",
+    "image": "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=400&h=300&fit=crop",
+    "badge": "Available"
+  },
+  {
+    "id": "house-7",
+    "name": "Geeta Ben — Laundry & Ironing",
+    "meta": "Same-day service · ★4.6 · Ahmedabad",
+    "tags": ["Laundry", "Ironing"],
+    "price": "₹200/load",
+    "image": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&h=300&fit=crop",
+    "badge": "Available"
+  },
+  {
+    "id": "house-8",
+    "name": "Vikram Mehta — AC Technician",
+    "meta": "All brands · ★4.8 · Jaipur",
+    "tags": ["AC Repair", "Service"],
+    "price": "₹500/visit",
+    "image": "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=400&h=300&fit=crop",
+    "badge": "Available"
+  },
+  {
+    "id": "house-9",
+    "name": "Kamla Singh — Elder Care Attendant",
+    "meta": "Trained, compassionate · ★4.9 · Lucknow",
+    "tags": ["Elder Care", "Medical"],
+    "price": "₹700/day",
+    "image": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&h=300&fit=crop",
+    "badge": "Available"
+  },
+  {
+    "id": "house-10",
+    "name": "PestShield Pro — Pest Control",
+    "meta": "Cockroach, termite, rodent · ★4.9 · Pan India",
+    "tags": ["Pest Control", "Certified"],
+    "price": "₹799/visit",
+    "image": "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=400&h=300&fit=crop",
+    "badge": "Highly Rated",
+    "isUrgent": true
+  }
+]

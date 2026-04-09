@@ -1,0 +1,93 @@
+[
+  {
+    "id": "aad-1",
+    "name": "New Aadhaar Enrollment — Adult",
+    "meta": "Biometric + document verification · Delhi, NCR",
+    "tags": ["New", "Adult"],
+    "price": "FREE Govt.",
+    "image": "assets/generated/category-aadhaar.jpg",
+    "badge": "Available"
+  },
+  {
+    "id": "aad-2",
+    "name": "Child Aadhaar (Baal Aadhaar)",
+    "meta": "Age 0–5 years · Birth cert needed · Mumbai",
+    "tags": ["Child", "New"],
+    "price": "FREE",
+    "image": "/assets/generated/category-aadhaar.dim_600x400.jpg",
+    "badge": "Available"
+  },
+  {
+    "id": "aad-3",
+    "name": "Address Update Service",
+    "meta": "Home visit for address update · Bangalore",
+    "tags": ["Update", "Address"],
+    "price": "₹50 Govt Fee",
+    "image": "/assets/generated/category-aadhaar.dim_600x400.jpg",
+    "badge": "Available"
+  },
+  {
+    "id": "aad-4",
+    "name": "Name Correction / Spelling Fix",
+    "meta": "Document required · Hyderabad",
+    "tags": ["Correction", "Name"],
+    "price": "₹50 Govt Fee",
+    "image": "/assets/generated/category-aadhaar.dim_600x400.jpg",
+    "badge": "Available"
+  },
+  {
+    "id": "aad-5",
+    "name": "Biometric / Photo Update",
+    "meta": "Fingerprint + Iris + Photo · Chennai",
+    "tags": ["Biometric", "Update"],
+    "price": "₹100 Govt Fee",
+    "image": "/assets/generated/category-aadhaar.dim_600x400.jpg",
+    "badge": "Available"
+  },
+  {
+    "id": "aad-6",
+    "name": "Date of Birth Correction",
+    "meta": "Birth cert / school cert needed · Pune",
+    "tags": ["Correction", "DOB"],
+    "price": "₹50 Govt Fee",
+    "image": "/assets/generated/category-aadhaar.dim_600x400.jpg",
+    "badge": "Available"
+  },
+  {
+    "id": "aad-7",
+    "name": "eAadhaar Download & Print Assistance",
+    "meta": "Doorstep help with UIDAI portal · Kolkata",
+    "tags": ["Download", "eAadhaar"],
+    "price": "FREE",
+    "image": "/assets/generated/category-aadhaar.dim_600x400.jpg",
+    "badge": "Available"
+  },
+  {
+    "id": "aad-8",
+    "name": "Mobile Number Linking / Update",
+    "meta": "Link new SIM to Aadhaar · Jaipur",
+    "tags": ["Mobile", "Linking"],
+    "price": "₹50 Govt Fee",
+    "image": "/assets/generated/category-aadhaar.dim_600x400.jpg",
+    "badge": "Available"
+  },
+  {
+    "id": "aad-9",
+    "name": "Aadhaar Lock / Unlock Service",
+    "meta": "Security lock guidance · Pan India (Online)",
+    "tags": ["Security", "Lock"],
+    "price": "FREE",
+    "image": "/assets/generated/category-aadhaar.dim_600x400.jpg",
+    "badge": "Available"
+  },
+  {
+    "id": "aad-10",
+    "name": "Senior Citizen Doorstep Aadhaar Help",
+    "meta": "Home visit, fully assisted · Pan India",
+    "tags": ["Senior", "Doorstep"],
+    "price": "FREE Service",
+    "image": "/assets/generated/category-aadhaar.dim_600x400.jpg",
+    "badge": "Most Needed",
+    "isUrgent": true
+  }
+]

@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const ADODB = require('node-adodb');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 app.use(cors());
@@ -8,138 +9,157 @@ app.use(express.json());
 // Serve static files from the current directory
 app.use(express.static('.'));
 
-const connection = ADODB.open('Provider=Microsoft.ACE.OLEDB.12.0;Data Source=HelpMatrix.accdb;Persist Security Info=False;');
+const DATA_DIR = path.join(__dirname, 'data');
 
-// Helper to escape single quotes for MS Access SQL
-function sqlEscape(str) {
-  if (typeof str !== 'string') return str;
-  return str.replace(/'/g, "''");
+// Helper functions for JSON database
+function readData(file) {
+  const filePath = path.join(DATA_DIR, file);
+  if (!fs.existsSync(filePath)) return [];
+  try {
+    const content = fs.readFileSync(filePath, 'utf8');
+    return JSON.parse(content || '[]');
+  } catch (err) {
+    console.error(`Error reading ${file}:`, err);
+    return [];
+  }
 }
 
-// REGISTER API
-app.post('/api/register', async (req, res) => {
-  const { name, mobile, address, password, role, category, org } = req.body;
+function writeData(file, data) {
+  const filePath = path.join(DATA_DIR, file);
   try {
-    // Check if user exists
-    const users = await connection.query(`SELECT * FROM Users WHERE Mobile = '${mobile}' AND Role = '${role}'`);
-    if (users.length > 0) {
-      return res.status(400).json({ error: 'User already exists in this role. Please login.' });
-    }
-
-    // Insert user
-    await connection.execute(`
-      INSERT INTO Users (FullName, Mobile, Address, [Password], Role, Category, Org) 
-      VALUES ('${sqlEscape(name)}', '${sqlEscape(mobile)}', '${sqlEscape(address)}', '${sqlEscape(password)}', '${sqlEscape(role)}', '${sqlEscape(category || "")}', '${sqlEscape(org || "")}')
-    `);
-    
-    res.json({ success: true, message: 'Account created successfully' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Database error' });
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+    return true;
+  } catch (err) {
+    console.error(`Error writing ${file}:`, err);
+    return false;
   }
+}
+
+// GET Category Items API
+app.get('/api/items/:category', (req, res) => {
+  const { category } = req.params;
+  const items = readData(`${category.toLowerCase()}.json`);
+  res.json({ success: true, items });
+});
+
+// REGISTER API
+app.post('/api/register', (req, res) => {
+  const { name, mobile, address, password, role, category, org } = req.body;
+  const users = readData('users.json');
+  
+  if (users.find(u => u.Mobile === mobile && u.Role === role)) {
+    return res.status(400).json({ error: 'User already exists in this role. Please login.' });
+  }
+
+  const newUser = {
+    FullName: name,
+    Mobile: mobile,
+    Address: address,
+    Password: password,
+    Role: role,
+    Category: category || "",
+    Org: org || ""
+  };
+
+  users.push(newUser);
+  writeData('users.json', users);
+  
+  res.json({ success: true, message: 'Account created successfully' });
 });
 
 // LOGIN API
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', (req, res) => {
   const { mobile, password, role } = req.body;
-  try {
-    const users = await connection.query(`SELECT * FROM Users WHERE Mobile = '${sqlEscape(mobile)}' AND [Password] = '${sqlEscape(password)}' AND Role = '${sqlEscape(role)}'`);
-    if (users.length === 0) {
-      return res.status(401).json({ error: 'Invalid credentials or role mismatch!' });
-    }
-    
-    const user = users[0];
-    res.json({ success: true, user: { name: user.FullName, mobile: user.Mobile, role: user.Role } });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Database error' });
+  const users = readData('users.json');
+  
+  const user = users.find(u => u.Mobile === mobile && u.Password === password && u.Role === role);
+  
+  if (!user) {
+    return res.status(401).json({ error: 'Invalid credentials or role mismatch!' });
   }
+  
+  res.json({ success: true, user: { name: user.FullName, mobile: user.Mobile, role: user.Role } });
 });
 
 // ORDERS API (Submit from Consumer)
-app.post('/api/orders', async (req, res) => {
+app.post('/api/orders', (req, res) => {
   const { id, userMobile, item, address, urgency, status, date, price, providerMobile } = req.body;
-  try {
-    await connection.execute(`
-      INSERT INTO Orders (OrderID, UserMobile, Item, Address, Urgency, Status, OrderDate, Price, ProviderMobile) 
-      VALUES ('${sqlEscape(id)}', '${sqlEscape(userMobile)}', '${sqlEscape(item)}', '${sqlEscape(address)}', '${sqlEscape(urgency)}', '${sqlEscape(status)}', '${sqlEscape(date)}', '${sqlEscape(price || "0")}', '${sqlEscape(providerMobile || "Not Assigned")}')
-    `);
-    res.json({ success: true });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Database error' });
-  }
+  const orders = readData('orders.json');
+  
+  const newOrder = {
+    OrderID: id,
+    UserMobile: userMobile,
+    Item: item,
+    Address: address,
+    Urgency: urgency,
+    Status: status,
+    OrderDate: date,
+    Price: price || "0",
+    ProviderMobile: providerMobile || "Not Assigned"
+  };
+
+  orders.push(newOrder);
+  writeData('orders.json', orders);
+  res.json({ success: true });
 });
 
-// GET ORDERS 
-app.get('/api/orders/:mobile', async (req, res) => {
+// GET ORDERS (Consumer)
+app.get('/api/orders/:mobile', (req, res) => {
   const { mobile } = req.params;
-  try {
-    const orders = await connection.query(`SELECT * FROM Orders WHERE UserMobile = '${mobile}'`);
-    res.json({ success: true, orders });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Database error' });
-  }
+  const orders = readData('orders.json');
+  const userOrders = orders.filter(o => o.UserMobile === mobile);
+  res.json({ success: true, orders: userOrders });
 });
+
 // Orders for a Provider (Incoming requests)
-app.get('/api/provider/orders/:mobile', async (req, res) => {
+app.get('/api/provider/orders/:mobile', (req, res) => {
   const { mobile } = req.params;
-  try {
-    let orders = await connection.query(`SELECT * FROM Orders WHERE ProviderMobile = '${sqlEscape(mobile)}'`);
-    
-    // Auto-seed mock data for every provider if they have no orders
-    if (orders.length === 0) {
-      const mockOrders = [
-        ['HM-D' + Math.floor(1000+Math.random()*9000), '0987654321', 'Premium Saree Set', '456 MG Road, Mumbai', 'Normal', 'Pending', '4/8/2026', '1250', mobile],
-        ['HM-D' + Math.floor(1000+Math.random()*9000), '1234567890', 'Leather Jacket', '789 Connaught Place, Delhi', 'High', 'Pending', '4/8/2026', '2499', mobile],
-        ['HM-D' + Math.floor(1000+Math.random()*9000), '5555555555', 'Handmade Vase', '101 FC Road, Pune', 'Normal', 'Pending', '4/8/2026', '450', mobile]
-      ];
-
-      for (const mo of mockOrders) {
-        await connection.execute(`
-          INSERT INTO Orders (OrderID, UserMobile, Item, Address, Urgency, Status, OrderDate, Price, ProviderMobile) 
-          VALUES ('${mo[0]}', '${mo[1]}', '${mo[2]}', '${mo[3]}', '${mo[4]}', '${mo[5]}', '${mo[6]}', '${mo[7]}', '${mo[8]}')
-        `);
-      }
-      // Re-fetch now that we've seeded
-      orders = await connection.query(`SELECT * FROM Orders WHERE ProviderMobile = '${sqlEscape(mobile)}'`);
-    }
-
-    res.json({ success: true, orders });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Database error' });
+  const orders = readData('orders.json');
+  let providerOrders = orders.filter(o => o.ProviderMobile === mobile);
+  
+  // Auto-seed mock data for every provider if they have no orders
+  if (providerOrders.length === 0) {
+    const mockOrders = [
+      { OrderID: 'HM-D' + Math.floor(1000+Math.random()*9000), UserMobile: '0987654321', Item: 'Premium Saree Set', Address: '456 MG Road, Mumbai', Urgency: 'Normal', Status: 'Pending', OrderDate: '4/8/2026', Price: '1250', ProviderMobile: mobile },
+      { OrderID: 'HM-D' + Math.floor(1000+Math.random()*9000), UserMobile: '1234567890', Item: 'Leather Jacket', Address: '789 Connaught Place, Delhi', Urgency: 'High', Status: 'Pending', OrderDate: '4/8/2026', Price: '2499', ProviderMobile: mobile },
+      { OrderID: 'HM-D' + Math.floor(1000+Math.random()*9000), UserMobile: '5555555555', Item: 'Handmade Vase', Address: '101 FC Road, Pune', Urgency: 'Normal', Status: 'Pending', OrderDate: '4/8/2026', Price: '450', ProviderMobile: mobile }
+    ];
+    orders.push(...mockOrders);
+    writeData('orders.json', orders);
+    providerOrders = mockOrders;
   }
+
+  res.json({ success: true, orders: providerOrders });
 });
 
 // Products for a Provider
-app.get('/api/provider/products/:mobile', async (req, res) => {
+app.get('/api/provider/products/:mobile', (req, res) => {
   const { mobile } = req.params;
-  try {
-    const products = await connection.query(`SELECT * FROM Products WHERE ProviderMobile = '${sqlEscape(mobile)}'`);
-    res.json({ success: true, products });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Database error' });
-  }
+  const products = readData('provider_pending_products.json');
+  const providerProducts = products.filter(p => p.ProviderMobile === mobile);
+  res.json({ success: true, products: providerProducts });
 });
 
 // Add Product (Provider)
-app.post('/api/provider/products', async (req, res) => {
+app.post('/api/provider/products', (req, res) => {
   const { id, mobile, name, category, price, status } = req.body;
-  try {
-    await connection.execute(`
-      INSERT INTO Products (ProductID, ProviderMobile, ItemName, Category, Price, [Status]) 
-      VALUES ('${sqlEscape(id)}', '${sqlEscape(mobile)}', '${sqlEscape(name)}', '${sqlEscape(category)}', '${sqlEscape(price)}', '${sqlEscape(status)}')
-    `);
-    res.json({ success: true });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Database error' });
-  }
+  const products = readData('provider_pending_products.json');
+  
+  const newProduct = {
+    ProductID: id,
+    ProviderMobile: mobile,
+    ItemName: name,
+    Category: category,
+    Price: price,
+    Status: status || "Pending"
+  };
+
+  products.push(newProduct);
+  writeData('provider_pending_products.json', products);
+  res.json({ success: true });
 });
 
 app.listen(3000, () => {
   console.log('HelpMatrix Backend running on http://localhost:3000');
 });
+

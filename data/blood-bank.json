@@ -1,0 +1,95 @@
+[
+  {
+    "id": "blood-1",
+    "name": "O+ Blood Donor Available",
+    "meta": "Last donated: 4 months ago · AIIMS Area, Delhi",
+    "tags": ["O+", "Donor"],
+    "price": "O+ Group",
+    "image": "assets/generated/category-blood.jpg",
+    "badge": "Urgent Need",
+    "isUrgent": true
+  },
+  {
+    "id": "blood-2",
+    "name": "A+ Blood — Apollo Blood Bank",
+    "meta": "Available units: 8 · Apollo Hospital, Mumbai",
+    "tags": ["A+", "Blood Bank"],
+    "price": "A+ Group",
+    "image": "https://images.unsplash.com/photo-1615461066841-6116ecaabb04?w=400&h=300&fit=crop",
+    "badge": "Available"
+  },
+  {
+    "id": "blood-3",
+    "name": "B+ Volunteer Donor",
+    "meta": "Healthy, 28 yrs · Pune, Hinjewadi",
+    "tags": ["B+", "Donor"],
+    "price": "B+ Group",
+    "image": "/assets/generated/category-blood.dim_600x400.jpg",
+    "badge": "Available"
+  },
+  {
+    "id": "blood-4",
+    "name": "AB– Rare Blood Group Donor",
+    "meta": "Rare type · Bangalore, Koramangala",
+    "tags": ["AB-", "Rare"],
+    "price": "AB- Group",
+    "image": "/assets/generated/product-blood-bag.dim_400x300.jpg",
+    "badge": "Rare",
+    "isUrgent": true
+  },
+  {
+    "id": "blood-5",
+    "name": "Red Cross Blood Bank — Delhi",
+    "meta": "All groups available · Open 24/7 · Connaught Place",
+    "tags": ["All Groups", "24/7"],
+    "price": "All Groups",
+    "image": "/assets/generated/category-blood.dim_600x400.jpg",
+    "badge": "Available"
+  },
+  {
+    "id": "blood-6",
+    "name": "O– Universal Donor",
+    "meta": "Universal donor blood · Hyderabad",
+    "tags": ["O-", "Universal"],
+    "price": "O- Group",
+    "image": "/assets/generated/product-blood-bag.dim_400x300.jpg",
+    "badge": "Available"
+  },
+  {
+    "id": "blood-7",
+    "name": "Platelets — Thalassemia Support",
+    "meta": "Platelet donation available · Chennai",
+    "tags": ["Platelets", "Thalassemia"],
+    "price": "Platelets",
+    "image": "/assets/generated/category-blood.dim_600x400.jpg",
+    "badge": "Available"
+  },
+  {
+    "id": "blood-8",
+    "name": "AB+ Donor — Emergency Ready",
+    "meta": "Responds in 1 hour · Kolkata, Salt Lake",
+    "tags": ["AB+", "Fast Response"],
+    "price": "AB+ Group",
+    "image": "/assets/generated/product-blood-bag.dim_400x300.jpg",
+    "badge": "Available"
+  },
+  {
+    "id": "blood-9",
+    "name": "Community Blood Drive Camp",
+    "meta": "Multi-city camps every weekend · Pan India",
+    "tags": ["Camp", "Community"],
+    "price": "FREE",
+    "image": "/assets/generated/category-blood.dim_600x400.jpg",
+    "badge": "Available"
+  },
+  {
+    "id": "blood-10",
+    "name": "B– Critical Need — PGIMER",
+    "meta": "Patient in surgery · Chandigarh, PGIMER",
+    "tags": ["B-", "Critical"],
+    "price": "B- Group",
+    "image": "https://images.unsplash.com/photo-1615461066841-6116ecaabb04?w=400&h=300&fit=crop",
+    "badge": "Critical",
+    "isUrgent": true
+  }
+]

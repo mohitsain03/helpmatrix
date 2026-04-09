@@ -1,0 +1,94 @@
+[
+  {
+    "id": "clot-1",
+    "name": "Heavy Winter Jacket (Men's)",
+    "meta": "Size: M–XL · Condition: Good · Delhi, Sector 9",
+    "tags": ["Winter", "Men", "Jacket"],
+    "price": "₹899",
+    "image": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=300&fit=crop",
+    "badge": "Available"
+  },
+  {
+    "id": "clot-2",
+    "name": "Cotton Saree Set (Women's)",
+    "meta": "2 sarees · Condition: Excellent · Mumbai, Andheri",
+    "tags": ["Women", "Saree", "Cotton"],
+    "price": "₹650",
+    "image": "assets/generated/category-clothing.jpg",
+    "badge": "Available"
+  },
+  {
+    "id": "clot-3",
+    "name": "School Uniform Set (Kids)",
+    "meta": "Age 8–12 · Condition: Good · Pune, Camp",
+    "tags": ["Kids", "School", "Uniform"],
+    "price": "₹1,100",
+    "image": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=300&fit=crop",
+    "badge": "Urgent",
+    "isUrgent": true
+  },
+  {
+    "id": "clot-4",
+    "name": "Festive Kurta Set (Men's)",
+    "meta": "Size: L · Occasion: Festival/Wedding · Hyderabad",
+    "tags": ["Men", "Festive"],
+    "price": "₹1,500",
+    "image": "assets/generated/category-clothing.jpg",
+    "badge": "Available"
+  },
+  {
+    "id": "clot-5",
+    "name": "Waterproof Raincoat",
+    "meta": "Unisex, One Size · Condition: New · Bangalore",
+    "tags": ["Unisex", "Monsoon"],
+    "price": "₹350",
+    "image": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=300&fit=crop",
+    "badge": "Available"
+  },
+  {
+    "id": "clot-6",
+    "name": "Baby Clothes Bundle (0–2 yr)",
+    "meta": "15 pieces · Washed & Clean · Chennai",
+    "tags": ["Baby", "Bundle"],
+    "price": "₹450",
+    "image": "assets/generated/category-clothing.jpg",
+    "badge": "Available"
+  },
+  {
+    "id": "clot-7",
+    "name": "Woolen Blanket / Shawl",
+    "meta": "Adult Size · Clean & Folded · Jaipur",
+    "tags": ["Winter", "Blanket"],
+    "price": "₹799",
+    "image": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=300&fit=crop",
+    "badge": "Available"
+  },
+  {
+    "id": "clot-8",
+    "name": "T-Shirt Pack (Men's, 5pc)",
+    "meta": "Size: M–XL · Cotton · Kolkata",
+    "tags": ["Men", "Cotton", "Casual"],
+    "price": "₹999",
+    "image": "assets/generated/category-clothing.jpg",
+    "badge": "Available"
+  },
+  {
+    "id": "clot-9",
+    "name": "Ladies Salwar Suit Set",
+    "meta": "Size: 38–42 · Cotton · Lucknow",
+    "tags": ["Women", "Salwar"],
+    "price": "₹1,250",
+    "image": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=300&fit=crop",
+    "badge": "Available"
+  },
+  {
+    "id": "clot-10",
+    "name": "Sports Shoes (Men's, Size 8–10)",
+    "meta": "Condition: Good · Ahmedabad",
+    "tags": ["Footwear", "Men"],
+    "price": "₹2,100",
+    "image": "assets/generated/category-clothing.jpg",
+    "badge": "Limited",
+    "isUrgent": true
+  }
+]

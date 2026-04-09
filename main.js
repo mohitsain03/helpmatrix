@@ -426,6 +426,67 @@ function initLoginPage() {
 let currentRequestItemName = '';
 let currentRequestItemPrice = '0';
 let currentRequestItemProvider = '';
+// ---- DYNAMIC PRODUCT LOADING ----
+async function loadCategoryItems() {
+  const container = document.querySelector('[data-ocid="products.list"]');
+  if (!container) return;
+
+  // Identify category from title or URL
+  const title = document.title.split('-')[1]?.trim().toLowerCase();
+  const categoryMap = {
+    'electronics': 'electronics',
+    'clothing': 'clothing',
+    'household workers': 'household',
+    'aadhaar services': 'aadhaar',
+    'blood bank': 'blood-bank',
+    'emergency helpline': 'emergency'
+  };
+  const category = categoryMap[title] || 'electronics';
+
+  try {
+    const res = await fetch(`${API_BASE}/api/items/${category}`);
+    const data = await res.json();
+    if (data.success && data.items) {
+      renderProducts(container, data.items, category);
+    }
+  } catch (err) {
+    console.error('Error loading items:', err);
+  }
+}
+
+function renderProducts(container, items, category) {
+  container.innerHTML = '';
+  items.forEach((item, index) => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    card.setAttribute('data-ocid', `products.item.${index + 1}`);
+    if (item.providerMobile) card.setAttribute('data-provider', item.providerMobile);
+
+    const badgeHtml = item.badge ? `<span class="product-badge ${item.isUrgent ? 'urgent' : ''}">${item.badge}</span>` : '';
+    const actionBtnText = item.actionType === 'call' ? `Call ${item.actionValue}` : (category === 'aadhaar' ? 'Book' : (category === 'household' ? 'Book' : 'Request'));
+    const actionAttr = item.actionType === 'call' ? `href="tel:${item.actionValue}"` : '';
+    const actionClass = item.actionType === 'call' ? 'product-action-btn call-btn' : 'product-action-btn';
+
+    card.innerHTML = `
+      ${badgeHtml}
+      <div class="product-img-wrap"><img src="${item.image}" alt="${item.name}"/></div>
+      <div class="product-body">
+        <div class="product-name">${item.name}</div>
+        <div class="product-meta">${item.meta}</div>
+        <div class="product-tags">${item.tags.map(t => `<span class="product-tag">${t}</span>`).join('')}</div>
+        <div class="product-footer">
+          <div class="product-price ${item.price === 'FREE Borrow' || item.price === 'FREE' ? 'free' : ''}">${item.price}</div>
+          <button class="${actionClass}" data-ocid="products.item.${index + 1}.button" ${actionAttr}>${actionBtnText}</button>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+  
+  // Re-initialize product actions for new buttons
+  initProductActions();
+}
+
 function initProductActions() {
   const modal = document.getElementById('checkout-modal');
   
@@ -555,6 +616,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initAuth(); // NEW
   initLoginPage();
   initProductActions();
+  loadCategoryItems(); // Load items dynamically if on category page
 
   setTimeout(() => {
     if (typeof THREE !== 'undefined') initThreeHero();

@@ -1,0 +1,20 @@
+[
+  {
+    "FullName": "Test User",
+    "Mobile": "1234567890",
+    "Address": "123 Test Lane, Delhi",
+    "Password": "password123",
+    "Role": "Consumer",
+    "Category": "",
+    "Org": ""
+  },
+  {
+    "FullName": "Test Provider",
+    "Mobile": "9999999999",
+    "Address": "456 Provider St, Mumbai",
+    "Password": "provider123",
+    "Role": "Provider",
+    "Category": "Clothing",
+    "Org": "HelpMatrix NGOs"
+  }
+]
