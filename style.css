@@ -1376,3 +1376,124 @@ footer {
 @media (max-width: 768px) {
   .dashboard-layout { grid-template-columns: 1fr; }
 }
+
+/* ---- ORDER CALENDAR ---- */
+.order-calendar {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--glass-border);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.calendar-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.calendar-nav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.calendar-nav-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--glass-border);
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+
+.calendar-nav-btn:hover {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-day-label {
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  padding-bottom: 0.5rem;
+}
+
+.calendar-date {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  background: rgba(255,255,255,0.02);
+}
+
+.calendar-date:hover {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+
+.calendar-date.has-order::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  width: 4px;
+  height: 4px;
+  background: var(--accent-cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 5px var(--accent-cyan);
+}
+
+.calendar-date.selected {
+  background: var(--accent-blue) !important;
+  color: #fff !important;
+  box-shadow: var(--glow-blue);
+}
+
+.calendar-date.today {
+  border: 1px solid var(--accent-purple);
+  color: var(--accent-purple);
+}
+
+.calendar-date.empty {
+  cursor: default;
+  background: transparent;
+}
+.calendar-date.empty:hover {
+  background: transparent;
+}
+
+.order-date-link {
+  color: var(--accent-cyan);
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.order-date-link:hover {
+  color: var(--accent-blue);
+}

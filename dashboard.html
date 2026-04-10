@@ -42,11 +42,33 @@
       <li><a href="index.html#categories" style="color:var(--text-muted);text-decoration:none;font-weight:500;display:flex;align-items:center;gap:0.75rem;"><span>🔍</span> Browse Catalog</a></li>
       <li><a href="#" style="color:var(--text-muted);text-decoration:none;font-weight:500;display:flex;align-items:center;gap:0.75rem;"><span>⚙️</span> Settings</a></li>
     </ul>
+
+    <!-- CALENDAR -->
+    <div class="order-calendar" id="calendar-container">
+      <div class="calendar-header">
+        <div class="calendar-title" id="calendar-month-year">Month Year</div>
+        <div class="calendar-nav">
+          <button class="calendar-nav-btn" onclick="changeMonth(-1)">‹</button>
+          <button class="calendar-nav-btn" onclick="changeMonth(1)">›</button>
+        </div>
+      </div>
+      <div class="calendar-grid" id="calendar-grid">
+        <!-- Days labels -->
+        <div class="calendar-day-label">S</div>
+        <div class="calendar-day-label">M</div>
+        <div class="calendar-day-label">T</div>
+        <div class="calendar-day-label">W</div>
+        <div class="calendar-day-label">T</div>
+        <div class="calendar-day-label">F</div>
+        <div class="calendar-day-label">S</div>
+        <!-- Dates dynamic -->
+      </div>
+    </div>
   </div>
 
   <!-- CONTENT -->
   <div class="dash-content">
-    <h2 style="font-family:'Orbitron',monospace;font-size:2rem;margin-bottom:2rem;color:#fff;">Active Orders / Requests</h2>
+    <h2 style="font-family:'Orbitron',monospace;font-size:2rem;margin-bottom:2rem;color:#fff;" id="content-title">Active Orders / Requests</h2>
     
     <div id="orders-container">
       <!-- Orders dynamically loaded here -->
@@ -58,117 +80,171 @@
 <script src="main.js"></script>
 <script>
   (() => {
-    console.log("Dashboard IIFE Initializing...");
+    let allOrders = [];
+    let selectedDate = null;
+    let calendarDate = new Date(); // Current month viewing
 
     const initDashboard = async () => {
       // 1. Load User Data from LocalStorage
       const userStr = localStorage.getItem('helpmatrix_user');
-      console.log("LocalStorage helpmatrix_user:", userStr);
-
       if (!userStr) {
-        console.warn("No user session found, redirecting to login.");
         window.location.href = 'login.html';
         return;
       }
 
-      let user;
-      try {
-        user = JSON.parse(userStr);
-        console.log("Parsed User Object:", user);
-      } catch (e) {
-        console.error("JSON parse failed for user session:", e);
-        localStorage.removeItem('helpmatrix_user');
-        window.location.href = 'login.html';
-        return;
-      }
-
-      // 2. Populate Sidebar Info
+      const user = JSON.parse(userStr);
       const nameEl = document.getElementById('dash-name');
       const roleEl = document.getElementById('dash-role');
       const avatarEl = document.getElementById('dash-avatar');
-
-      console.log("Elements found:", { nameEl: !!nameEl, roleEl: !!roleEl, avatarEl: !!avatarEl });
 
       if (nameEl) nameEl.textContent = user.name || 'User';
       if (roleEl) roleEl.textContent = (user.role || '').toLowerCase() === 'provider' ? 'Provider Account' : 'Consumer Account';
       if (avatarEl) avatarEl.textContent = (user.name || 'U').charAt(0).toUpperCase();
 
-      // 3. Build API Base
+      const userMobile = user.mobile || 'Unknown';
       const API_BASE = (window.location.port !== '3000' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')) 
         ? 'http://localhost:3000' 
         : '';
-      const userMobile = user.mobile || 'Unknown';
-      const ordersContainer = document.getElementById('orders-container');
-
-      if (!ordersContainer) {
-        console.error("orders-container element not found in DOM!");
-        return;
-      }
 
       // 4. Fetch and Render Orders
-      console.log(`Fetching orders for ${userMobile} from ${API_BASE}/api/orders/${userMobile}...`);
       try {
+        console.log(`Fetching orders from ${API_BASE}/api/orders/${userMobile}...`);
         const res = await fetch(`${API_BASE}/api/orders/${userMobile}`);
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
+        console.log("Orders received:", data);
+        allOrders = data.success ? data.orders : [];
         
-        console.log("API Response Data:", data);
-        const orders = data.success ? data.orders : [];
-        let totalAmount = 0;
+        renderOrders(allOrders);
+        renderCalendar();
+      } catch (err) {
+        console.error("Order load error:", err);
+        document.getElementById('orders-container').innerHTML = `<p style="color:#ef4444;text-align:center;">Error loading orders: ${err.message}</p>`;
+      }
+    };
 
-        if (orders.length === 0) {
-          ordersContainer.innerHTML = `
-            <div style="text-align:center;padding:4rem 2rem;background:var(--glass-bg);border:1px dashed var(--glass-border);border-radius:16px;">
-              <div style="font-size:3rem;margin-bottom:1rem;">📭</div>
-              <h3 style="color:#fff;margin-bottom:0.5rem;">No Active Requests</h3>
-              <p style="color:var(--text-muted);margin-bottom:1.5rem;">You haven't made any requests yet.</p>
-              <a href="index.html#categories" class="btn-primary">Browse Services</a>
-            </div>
-          `;
-          return;
-        }
+    const renderOrders = (orders, filterDate = null) => {
+      const ordersContainer = document.getElementById('orders-container');
+      const contentTitle = document.getElementById('content-title');
+      
+      if (filterDate) {
+        contentTitle.textContent = `Requests for ${filterDate}`;
+      } else {
+        contentTitle.textContent = `Active Orders / Requests`;
+      }
 
-        const ordersHtml = [...orders].reverse().map(order => {
-          const status = order.Status || 'Pending';
-          const statusColor = status === 'Pending' ? '#eab308' : (status === 'Accepted' ? '#22c55e' : (status === 'Processing' ? '#3b82f6' : '#22c55e'));
-          const oid = order.OrderID || 'N/A';
-          const opriceStr = (order.Price || '0').toString();
-          const oprice = parseFloat(opriceStr.replace(/[^0-9.]/g, '')) || 0;
-          totalAmount += oprice;
+      if (orders.length === 0) {
+        ordersContainer.innerHTML = `
+          <div style="text-align:center;padding:4rem 2rem;background:var(--glass-bg);border:1px dashed var(--glass-border);border-radius:16px;">
+            <div style="font-size:3rem;margin-bottom:1rem;">📭</div>
+            <h3 style="color:#fff;margin-bottom:0.5rem;">${filterDate ? 'No requests for this day' : 'No Active Requests'}</h3>
+            <p style="color:var(--text-muted);margin-bottom:1.5rem;">${filterDate ? 'Try selecting another date or clear filter.' : "You haven't made any requests yet."}</p>
+            ${filterDate ? '<button onclick="filterByDate(null)" class="btn-secondary" style="padding:0.5rem 1rem;font-size:0.8rem;">Clear Filter</button>' : '<a href="index.html#categories" class="btn-primary">Browse Services</a>'}
+          </div>
+        `;
+        return;
+      }
 
-          return `
-            <div class="dash-card">
-              <div>
-                <div style="color:var(--text-muted);font-size:0.8rem;margin-bottom:0.25rem;">Order ID: <span style="font-family:monospace;color:#fff;">${oid}</span> • ${order.OrderDate || 'N/A'}</div>
-                <h4>${order.Item || 'Unknown Item'}</h4>
-                <p>Address: ${order.Address || 'N/A'} • Urgency: <strong style="color:var(--accent-red);">${order.Urgency || 'Normal'}</strong></p>
-                <div style="margin-top:0.5rem;font-weight:700;color:var(--accent-cyan);">Price: ₹${oprice.toLocaleString()}</div>
-              </div>
-              <div style="text-align:right;">
-                <span class="status" style="background:rgba(234, 179, 8, 0.15);color:${statusColor};display:block;margin-bottom:0.5rem;">${status === 'Accepted' ? 'Approved by Provider' : status}</span>
-                ${status === 'Pending' ? `<button onclick="cancelOrder('${oid}')" style="background:rgba(239, 68, 68, 0.1); color:#ef4444; border:1px solid rgba(239, 68, 68, 0.2); padding:0.4rem 0.6rem; border-radius:6px; font-size:0.7rem; cursor:pointer; font-weight:600; width:100%;">Cancel Request</button>` : ''}
-              </div>
-            </div>
-          `;
-        }).join('');
+      let totalAmount = 0;
+      const ordersHtml = [...orders].reverse().map(order => {
+        const status = order.Status || 'Pending';
+        const statusColor = status === 'Pending' ? '#eab308' : (status === 'Accepted' ? '#22c55e' : (status === 'Processing' ? '#3b82f6' : '#22c55e'));
+        const oid = order.OrderID || 'N/A';
+        const opriceStr = (order.Price || '0').toString();
+        const oprice = parseFloat(opriceStr.replace(/[^0-9.]/g, '')) || 0;
+        totalAmount += oprice;
 
-        const summaryHtml = `
-          <div class="dash-card" style="background:linear-gradient(135deg, rgba(59,130,246,0.1), rgba(6,182,212,0.1)); border-color:var(--accent-blue);">
+        return `
+          <div class="dash-card">
             <div>
-              <h3 style="color:#fff;margin-bottom:0.25rem;">Order Summary</h3>
-              <p style="color:var(--text-muted);">Total requests across all categories</p>
+              <div style="color:var(--text-muted);font-size:0.8rem;margin-bottom:0.25rem;">
+                Order ID: <span style="font-family:monospace;color:#fff;">${oid}</span> • 
+                <span class="order-date-link" onclick="filterByDate('${order.OrderDate}')">${order.OrderDate || 'N/A'}</span>
+              </div>
+              <h4>${order.Item || 'Unknown Item'}</h4>
+              <p>Address: ${order.Address || 'N/A'} • Urgency: <strong style="color:var(--accent-red);">${order.Urgency || 'Normal'}</strong></p>
+              <div style="margin-top:0.5rem;font-weight:700;color:var(--accent-cyan);">Price: ₹${oprice.toLocaleString()}</div>
             </div>
             <div style="text-align:right;">
-              <div style="font-size:0.8rem;color:var(--text-muted);">Total Amount</div>
-              <div style="font-size:1.8rem;font-weight:800;color:var(--accent-cyan);font-family:'Orbitron',monospace;">₹${totalAmount.toLocaleString()}</div>
+              <span class="status" style="background:rgba(234, 179, 8, 0.15);color:${statusColor};display:block;margin-bottom:0.5rem;">${status === 'Accepted' ? 'Approved by Provider' : status}</span>
+              ${status === 'Pending' ? `<button onclick="cancelOrder('${oid}')" style="background:rgba(239, 68, 68, 0.1); color:#ef4444; border:1px solid rgba(239, 68, 68, 0.2); padding:0.4rem 0.6rem; border-radius:6px; font-size:0.7rem; cursor:pointer; font-weight:600; width:100%;">Cancel Request</button>` : ''}
             </div>
           </div>
         `;
+      }).join('');
 
-        ordersContainer.innerHTML = summaryHtml + ordersHtml;
-      } catch (err) {
-        console.error("Order load error:", err);
-        ordersContainer.innerHTML = `<p style="color:#ef4444;text-align:center;">Error loading orders: ${err.message}</p>`;
+      const summaryHtml = `
+        <div class="dash-card" style="background:linear-gradient(135deg, rgba(59,130,246,0.1), rgba(6,182,212,0.1)); border-color:var(--accent-blue);">
+          <div>
+            <h3 style="color:#fff;margin-bottom:0.25rem;">${filterDate ? 'Day Summary' : 'Total Summary'}</h3>
+            <p style="color:var(--text-muted);">${filterDate ? 'Requests on this specific date' : 'All your requests'}</p>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:0.8rem;color:var(--text-muted);">Amount</div>
+            <div style="font-size:1.8rem;font-weight:800;color:var(--accent-cyan);font-family:'Orbitron',monospace;">₹${totalAmount.toLocaleString()}</div>
+          </div>
+        </div>
+      `;
+
+      ordersContainer.innerHTML = summaryHtml + ordersHtml;
+    };
+
+    window.filterByDate = (dateStr) => {
+      selectedDate = dateStr;
+      if (!dateStr) {
+        renderOrders(allOrders);
+      } else {
+        const filtered = allOrders.filter(o => o.OrderDate === dateStr);
+        renderOrders(filtered, dateStr);
+      }
+      renderCalendar();
+    };
+
+    window.changeMonth = (delta) => {
+      calendarDate.setMonth(calendarDate.getMonth() + delta);
+      renderCalendar();
+    };
+
+    const renderCalendar = () => {
+      const grid = document.getElementById('calendar-grid');
+      const monthYear = document.getElementById('calendar-month-year');
+      if (!grid || !monthYear) return;
+
+      monthYear.textContent = calendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+      // Clear previous dates (keep labels)
+      const labels = grid.querySelectorAll('.calendar-day-label');
+      grid.innerHTML = '';
+      labels.forEach(l => grid.appendChild(l));
+
+      const firstDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1).getDay();
+      const daysInMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0).getDate();
+
+      // Empty slots
+      for (let i = 0; i < firstDay; i++) {
+        const div = document.createElement('div');
+        div.className = 'calendar-date empty';
+        grid.appendChild(div);
+      }
+
+      // Dates
+      const today = new Date();
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateObj = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), d);
+        const dateStr = dateObj.toLocaleDateString(); // This matches the format stored (system dependent)
+        
+        // Wait, to be safe, we should construct the string exactly like main.js did if locale varies
+        // But main.js used toLocaleDateString() too.
+        
+        const hasOrder = allOrders.some(o => o.OrderDate === dateStr);
+        const isSelected = selectedDate === dateStr;
+        const isToday = dateObj.toDateString() === today.toDateString();
+
+        const div = document.createElement('div');
+        div.className = `calendar-date ${hasOrder ? 'has-order' : ''} ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}`;
+        div.textContent = d;
+        div.onclick = () => window.filterByDate(isSelected ? null : dateStr);
+        grid.appendChild(div);
       }
     };
 
