@@ -200,11 +200,23 @@ app.patch('/api/orders/:orderId/status', async (req, res) => {
     const { status, providerMobile } = req.body;
     
     if (providerMobile) {
+      // If provider is accepting the order, notify the consumer
       await execute(`
         UPDATE Orders 
         SET [Status] = '${status}', ProviderMobile = '${providerMobile}'
         WHERE OrderID = '${orderId}'
       `);
+      
+      // Get consumer mobile and item name for notification
+      const orderDetails = await query(`SELECT UserMobile, Item FROM Orders WHERE OrderID = '${orderId}'`);
+      if (orderDetails.length > 0) {
+        const { UserMobile, Item } = orderDetails[0];
+        const content = `Your request for "${Item}" has been ${status.toLowerCase()} by a provider. Check your dashboard for details.`;
+        await execute(`
+          INSERT INTO Notifications (UserMobile, Content, IsRead, CreateDate)
+          VALUES ('${UserMobile}', '${content.replace(/'/g, "''")}', 0, '${new Date().toLocaleString()}')
+        `);
+      }
     } else {
       await execute(`
         UPDATE Orders 
@@ -216,6 +228,69 @@ app.patch('/api/orders/:orderId/status', async (req, res) => {
     res.json({ success: true, message: `Order ${orderId} updated to ${status}` });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Failed to update order status' });
+  }
+});
+
+// --- NEW NOTIFICATION ENDPOINTS ---
+
+// Get Notifications for a user
+app.get('/api/notifications/:mobile', async (req, res) => {
+  try {
+    const { mobile } = req.params;
+    const rows = await query(`SELECT * FROM Notifications WHERE UserMobile = '${mobile}' AND IsRead = 0 ORDER BY ID DESC`);
+    res.json({ success: true, notifications: rows });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Failed to fetch notifications' });
+  }
+});
+
+// Mark Notification as read
+app.patch('/api/notifications/read/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await execute(`UPDATE Notifications SET IsRead = -1 WHERE ID = ${id}`);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Failed to mark notification as read' });
+  }
+});
+
+// --- NEW MESSAGING ENDPOINTS ---
+
+// Get Messages for an order
+app.get('/api/messages/:orderId', async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const rows = await query(`SELECT * FROM Messages WHERE OrderID = '${orderId}' ORDER BY ID ASC`);
+    res.json({ success: true, messages: rows });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Failed to fetch messages' });
+  }
+});
+
+// Send a Message
+app.post('/api/messages', async (req, res) => {
+  try {
+    const { orderId, senderMobile, receiverMobile, message } = req.body;
+    
+    await execute(`
+      INSERT INTO Messages (OrderID, SenderMobile, ReceiverMobile, Message, CreateDate)
+      VALUES ('${orderId}', '${senderMobile}', '${receiverMobile}', '${message.replace(/'/g, "''")}', '${new Date().toLocaleString()}')
+    `);
+
+    // Optionally notify the receiver
+    const sender = await query(`SELECT FullName FROM Users WHERE Mobile = '${senderMobile}'`);
+    const senderName = sender.length > 0 ? sender[0].FullName : 'Someone';
+    const content = `New message from ${senderName} regarding order ${orderId}.`;
+    
+    await execute(`
+      INSERT INTO Notifications (UserMobile, Content, IsRead, CreateDate)
+      VALUES ('${receiverMobile}', '${content.replace(/'/g, "''")}', 0, '${new Date().toLocaleString()}')
+    `);
+    
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Failed to send message' });
   }
 });
 

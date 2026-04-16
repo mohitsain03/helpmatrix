@@ -19,10 +19,49 @@
     <li><a href="index.html">Home</a></li>
     <li><a href="index.html#categories">Categories</a></li>
     <li><a href="index.html#about">About</a></li>
+    <!-- Notification Bell -->
+    <li id="nav-notifications-li">
+      <div class="nav-notify-container" id="notify-container">
+        <span class="nav-notify-btn">🔔</span>
+        <span class="nav-notify-badge" id="notify-badge">0</span>
+        <div class="notify-dropdown" id="notify-dropdown">
+          <div class="notify-header">
+            <h3>Notifications</h3>
+            <button id="clear-notifications" style="background:none;border:none;color:var(--accent-blue);font-size:0.75rem;cursor:pointer;">Clear All</button>
+          </div>
+          <div id="notifications-list">
+            <div class="notify-empty">No new notifications</div>
+          </div>
+        </div>
+      </div>
+    </li>
     <!-- The initAuth script will populate Dashboard/Logout links here -->
     <li><a href="login.html" class="nav-cta">Login</a></li>
   </ul>
 </nav>
+
+<!-- FLOATING CHAT WIDGET -->
+<div class="chat-widget" id="chat-widget" style="display:none;">
+  <div class="chat-window" id="chat-window">
+    <div class="chat-header">
+      <div class="chat-title">
+        <h4 id="chat-with-name">Support Chat</h4>
+        <span id="chat-status">Online</span>
+      </div>
+      <button class="modal-close" id="close-chat" style="background:none;border:none;color:var(--text-muted);font-size:1.5rem;cursor:pointer;">&times;</button>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="notify-empty">Select an order to start chatting</div>
+    </div>
+    <form class="chat-input-area" id="chat-form">
+      <input type="text" class="chat-input" id="chat-input" placeholder="Type a message..." required>
+      <button type="submit" class="chat-send-btn">🚀</button>
+    </form>
+  </div>
+  <div class="chat-bubble" id="chat-bubble">
+    <span>💬</span>
+  </div>
+</div>
 
 <!-- DASHBOARD LAYOUT -->
 <div class="dashboard-layout">
@@ -167,7 +206,8 @@
             </div>
             <div style="text-align:right;">
               <span class="status" style="background:rgba(234, 179, 8, 0.15);color:${statusColor};display:block;margin-bottom:0.5rem;">${status === 'Accepted' ? 'Approved by Provider' : status}</span>
-              ${status === 'Pending' ? `<button onclick="cancelOrder('${oid}')" style="background:rgba(239, 68, 68, 0.1); color:#ef4444; border:1px solid rgba(239, 68, 68, 0.2); padding:0.4rem 0.6rem; border-radius:6px; font-size:0.7rem; cursor:pointer; font-weight:600; width:100%;">Cancel Request</button>` : ''}
+              ${status === 'Pending' ? `<button onclick="cancelOrder('${oid}')" style="background:rgba(239, 68, 68, 0.1); color:#ef4444; border:1px solid rgba(239, 68, 68, 0.2); padding:0.4rem 0.6rem; border-radius:6px; font-size:0.7rem; cursor:pointer; font-weight:600; width:100%;">Cancel Request</button>` : 
+               (status === 'Accepted' || status === 'Processing' ? `<button onclick="openOrderChat('${oid}', '${order.ProviderMobile}', 'Provider')" class="btn-primary" style="padding:0.4rem 0.6rem; font-size:0.7rem; width:100%; margin-top:0.5rem; background:var(--accent-purple);">Chat with Provider</button>` : '')}
             </div>
           </div>
         `;

@@ -184,6 +184,16 @@ function showToast(msg, type = 'success') {
     : 'linear-gradient(135deg,#3b82f6,#06b6d4)';
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 3000);
+  if (type === 'success' || type === 'info') playNotificationSound();
+}
+
+// ---- NOTIFICATION SOUND ----
+function playNotificationSound() {
+  // Low-bitrate base64 "bing" sound (tiny 1kb wave)
+  const soundBase64 = "UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YT9vT18vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8ve3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3te3t7e3t7e3t7e3v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn59fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fWA==";
+  const audio = new Audio("data:audio/wav;base64," + soundBase64);
+  audio.volume = 0.4;
+  audio.play().catch(e => console.warn("Audio play failed (user interaction required)"));
 }
 
 // ---- COUNTER ANIMATION ----
@@ -236,9 +246,13 @@ function initAuth() {
   if (userStr) {
     try {
       const user = JSON.parse(userStr);
+      
+      // 1. Handle Navigation Updates
       const navLinks = document.getElementById('nav-links');
+      const navUser = document.querySelector('.nav-user');
+      
       if (navLinks) {
-        // Find Login button
+        // Consumer Style Nav
         const loginBtn = navLinks.querySelector('a[href="login.html"]');
         if (loginBtn) {
           const li = loginBtn.parentElement;
@@ -249,17 +263,41 @@ function initAuth() {
           const logoutLi = document.createElement('li');
           logoutLi.innerHTML = `<a href="#" id="nav-logout" style="color:var(--accent-red);font-weight:600;text-decoration:none;">Logout</a>`;
           navLinks.appendChild(logoutLi);
-
-          document.getElementById('nav-logout').addEventListener('click', e => {
-            e.preventDefault();
-            localStorage.removeItem('helpmatrix_user');
-            window.location.href = 'index.html';
-          });
         }
+      } 
+      
+      // 2. Global Auth Listeners (Logout)
+      // We look for nav-logout ID specifically now
+      const logoutBtn = document.getElementById('nav-logout') || document.querySelector('.nav-cta[onclick*="localStorage.removeItem"]');
+      if (logoutBtn) {
+        logoutBtn.id = 'nav-logout'; // Ensure it has the ID
+        logoutBtn.addEventListener('click', e => {
+          // If it's a link with href, prevent default unless we want it to navigate
+          if (logoutBtn.tagName === 'A') e.preventDefault();
+          localStorage.removeItem('helpmatrix_user');
+          window.location.href = 'index.html';
+        });
       }
+
+      // 3. Show Notifications Bell (Unified)
+      const notifyContainer = document.getElementById('notify-container');
+      const notifyLi = document.getElementById('nav-notifications-li');
+      
+      if (notifyLi) notifyLi.style.display = 'block';
+      if (notifyContainer) {
+        initNotifications(user.mobile);
+      }
+      
+      // 4. Show Chat Widget on Dashboard
+      const chatWidget = document.getElementById('chat-widget');
+      if (chatWidget) {
+        chatWidget.style.display = 'block';
+        initChat(user.mobile);
+      }
+
     } catch (e) {
-      console.warn("Invalid user data in storage, clearing it.");
-      localStorage.removeItem('helpmatrix_user');
+      console.warn("Auth initialization error:", e);
+      // localStorage.removeItem('helpmatrix_user'); // Don't clear on simple UI errors
     }
   }
 }
@@ -434,6 +472,205 @@ let currentRequestItemName = '';
 let currentRequestItemPrice = '0';
 let currentRequestItemProvider = '';
 let currentRequestItemCategory = '';
+// ---- NOTIFICATIONS LOGIC ----
+let lastNotifyCount = 0;
+function initNotifications(mobile) {
+  const badge = document.getElementById('notify-badge');
+  const dropdown = document.getElementById('notify-dropdown');
+  const list = document.getElementById('notifications-list');
+  const bell = document.getElementById('notify-container');
+  const clearBtn = document.getElementById('clear-notifications');
+
+  if (!bell) return;
+
+  bell.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdown.classList.toggle('show');
+  });
+
+  window.addEventListener('click', () => dropdown.classList.remove('show'));
+  dropdown.addEventListener('click', e => e.stopPropagation());
+
+  const poll = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/notifications/${mobile}`);
+      const data = await res.json();
+      if (data.success) {
+        const count = data.notifications.length;
+        badge.textContent = count;
+        badge.classList.toggle('active', count > 0);
+        
+        if (count > lastNotifyCount) {
+          playNotificationSound();
+        }
+        lastNotifyCount = count;
+
+        if (count === 0) {
+          list.innerHTML = '<div class="notify-empty">No new notifications</div>';
+        } else {
+          list.innerHTML = data.notifications.map(n => `
+            <div class="notify-item" onclick="markNotifyRead(${n.ID}, this)">
+              <div class="notify-item-content">${n.Content}</div>
+              <div class="notify-item-date">${n.CreateDate}</div>
+            </div>
+          `).join('');
+        }
+      }
+    } catch (e) {}
+    setTimeout(poll, 6000);
+  };
+  poll();
+
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      document.querySelectorAll('.notify-item').forEach(item => item.click());
+    });
+  }
+}
+
+async function markNotifyRead(id, el) {
+  try {
+    const res = await fetch(`${API_BASE}/api/notifications/read/${id}`, { method: 'PATCH' });
+    if (res.ok) {
+      el.style.opacity = '0';
+      setTimeout(() => el.remove(), 300);
+    }
+  } catch(e){}
+}
+
+// ---- CHAT LOGIC ----
+let currentChatOrderID = null;
+let currentChatReceiver = null;
+let chatPollingInterval = null;
+
+function initChat(userMobile) {
+  const bubble = document.getElementById('chat-bubble');
+  const window_ = document.getElementById('chat-window');
+  const close = document.getElementById('close-chat');
+  const form = document.getElementById('chat-form');
+  const input = document.getElementById('chat-input');
+  
+  if (!bubble) return;
+
+  bubble.addEventListener('click', () => window_.classList.toggle('active'));
+  close.addEventListener('click', () => window_.classList.remove('active'));
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!currentChatOrderID || !currentChatReceiver) {
+      showToast("Please select an order from your history to start chatting.", "info");
+      return;
+    }
+    
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: currentChatOrderID,
+          senderMobile: userMobile,
+          receiverMobile: currentChatReceiver,
+          message: msg
+        })
+      });
+      if (res.ok) {
+        input.value = '';
+        fetchMessages(currentChatOrderID, userMobile);
+      }
+    } catch(e){}
+  });
+}
+
+// Global exposure for dashboard buttons
+window.openOrderChat = (orderId, receiverMobile, receiverType) => {
+  const user = JSON.parse(localStorage.getItem('helpmatrix_user'));
+  if (!user) return;
+
+  currentChatOrderID = orderId;
+  currentChatReceiver = receiverMobile;
+  
+  const window_ = document.getElementById('chat-window');
+  const title = document.getElementById('chat-with-name');
+  const messages = document.getElementById('chat-messages');
+  
+  if (window_) window_.classList.add('active');
+  if (title) title.textContent = `${receiverType} Chat (#${orderId})`;
+  
+  if (chatPollingInterval) clearInterval(chatPollingInterval);
+  fetchMessages(orderId, user.mobile);
+  chatPollingInterval = setInterval(() => fetchMessages(orderId, user.mobile), 4000);
+};
+
+async function fetchMessages(orderId, myMobile) {
+  const container = document.getElementById('chat-messages');
+  if (!container) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/messages/${orderId}`);
+    const data = await res.json();
+    if (data.success) {
+      const html = data.messages.map(m => `
+        <div class="message ${m.SenderMobile === myMobile ? 'sent' : 'received'}">
+          ${m.Message}
+          <span class="message-time">${m.CreateDate.split(',')[1] || ''}</span>
+        </div>
+      `).join('');
+      
+      const shouldScroll = container.scrollTop + container.offsetHeight >= container.scrollHeight - 50;
+      container.innerHTML = html || '<div class="notify-empty">No messages yet. Say hi!</div>';
+      if (shouldScroll) container.scrollTop = container.scrollHeight;
+    }
+  } catch(e){}
+}
+
+// ---- SEARCH & FILTER LOGIC ----
+let allCategoryItems = [];
+
+async function initSearch() {
+  const searchInput = document.getElementById('product-search');
+  if (!searchInput) return;
+
+  searchInput.addEventListener('input', () => {
+    filterAndRender();
+  });
+
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filterAndRender();
+    });
+  });
+}
+
+function filterAndRender() {
+  const searchInput = document.getElementById('product-search');
+  const activeFilter = document.querySelector('.filter-btn.active')?.textContent.toLowerCase() || 'all';
+  const query = searchInput?.value.toLowerCase() || '';
+  const container = document.querySelector('[data-ocid="products.list"]');
+  
+  if (!container) return;
+
+  const filtered = allCategoryItems.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(query) || 
+                          (item.meta && item.meta.toLowerCase().includes(query)) || 
+                          (item.tags && item.tags.some(t => t.toLowerCase().includes(query)));
+    
+    if (activeFilter === 'all') return matchesSearch;
+    
+    // Simple category matching logic
+    const itemTags = item.tags.map(t => t.toLowerCase());
+    return matchesSearch && itemTags.includes(activeFilter);
+  });
+
+  // Re-run the render function with the detected category
+  const title = document.title.split('-')[1]?.trim().toLowerCase();
+  renderProducts(container, filtered, title);
+}
 // ---- DYNAMIC PRODUCT LOADING ----
 async function loadCategoryItems() {
   const container = document.querySelector('[data-ocid="products.list"]');
@@ -455,7 +692,9 @@ async function loadCategoryItems() {
     const res = await fetch(`${API_BASE}/api/items/${category}`);
     const data = await res.json();
     if (data.success && data.items) {
+      allCategoryItems = data.items; // Store for filtering
       renderProducts(container, data.items, category);
+      initSearch(); // Initialize search after loading
     }
   } catch (err) {
     console.error('Error loading items:', err);

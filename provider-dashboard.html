@@ -23,14 +23,51 @@
     <span class="nav-logo-text">HelpMatrix</span>
   </a>
   <div class="nav-user">
+    <!-- Notification Bell -->
+    <div class="nav-notify-container" id="notify-container" style="margin-right:1rem;">
+      <span class="nav-notify-btn">🔔</span>
+      <span class="nav-notify-badge" id="notify-badge">0</span>
+      <div class="notify-dropdown" id="notify-dropdown">
+        <div class="notify-header">
+          <h3>Notifications</h3>
+          <button id="clear-notifications" style="background:none;border:none;color:var(--accent-blue);font-size:0.75rem;cursor:pointer;">Clear All</button>
+        </div>
+        <div id="notifications-list">
+          <div class="notify-empty">No new notifications</div>
+        </div>
+      </div>
+    </div>
     <div class="user-info">
       <div class="user-name" id="dash-user-name">Provider Name</div>
       <div style="font-size:0.7rem;color:var(--text-muted);" id="dash-role">Provider Account</div>
     </div>
     <div class="user-avatar" id="dash-avatar">P</div>
-    <a href="index.html" class="nav-cta" style="background:#ef4444;margin-left:1rem;padding:0.5rem 1rem;" onclick="localStorage.removeItem('helpmatrix_user')">Logout</a>
+    <a href="index.html" class="nav-cta" id="nav-logout" style="background:#ef4444;margin-left:1rem;padding:0.5rem 1rem;" onclick="localStorage.removeItem('helpmatrix_user')">Logout</a>
   </div>
 </nav>
+
+<!-- FLOATING CHAT WIDGET -->
+<div class="chat-widget" id="chat-widget" style="display:none;">
+  <div class="chat-window" id="chat-window" style="background: rgba(15, 23, 42, 0.98);">
+    <div class="chat-header">
+      <div class="chat-title">
+        <h4 id="chat-with-name">Consumer Chat</h4>
+        <span id="chat-status">Online</span>
+      </div>
+      <button class="modal-close" id="close-chat" style="background:none;border:none;color:var(--text-muted);font-size:1.5rem;cursor:pointer;">&times;</button>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="notify-empty">Select an order to start chatting</div>
+    </div>
+    <form class="chat-input-area" id="chat-form">
+      <input type="text" class="chat-input" id="chat-input" placeholder="Type a message..." required>
+      <button type="submit" class="chat-send-btn">🚀</button>
+    </form>
+  </div>
+  <div class="chat-bubble" id="chat-bubble">
+    <span>💬</span>
+  </div>
+</div>
 
 <div class="dashboard-container">
   <header class="dash-header">
@@ -151,7 +188,8 @@
               </div>
               <div style="text-align:right;">
                 <span class="status" style="background:rgba(234,179,8,0.1);color:#eab308;display:block;margin-bottom:0.5rem;" id="status-${o.OrderID}">${o.Status}</span>
-                ${o.Status === 'Pending' ? `<button class="btn-primary" id="btn-${o.OrderID}" style="padding:0.4rem 0.8rem;font-size:0.7rem;" onclick="approveOrder('${o.OrderID}')">Approve</button>` : ''}
+                ${o.Status === 'Pending' ? `<button class="btn-primary" id="btn-${o.OrderID}" style="padding:0.4rem 0.8rem;font-size:0.7rem;" onclick="approveOrder('${o.OrderID}')">Approve</button>` : 
+                 `<button class="btn-primary" style="padding:0.4rem 0.8rem;font-size:0.7rem;background:var(--accent-purple);" onclick="openOrderChat('${o.OrderID}', '${o.UserMobile}', 'Consumer')">Chat with Consumer</button>`}
               </div>
             </div>
           `).join('');
